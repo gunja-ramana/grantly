@@ -1,7 +1,8 @@
-import React from 'react';
-import { Menu, User, DollarSign, Calendar, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, User, DollarSign, Calendar, CheckCircle2, Sparkles } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
+import { InnovationHubModal } from '../common/InnovationHubModal';
 
 interface NavbarProps {
   onToggleMobileMenu: () => void;
@@ -10,6 +11,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
   const { state, fundingMetrics, opportunityDNA, nearestUpcomingDeadline } = useApp();
   const location = useLocation();
+  const [isInnovationModalOpen, setIsInnovationModalOpen] = useState(false);
 
   const getPageTitle = () => {
     switch (location.pathname) {
@@ -126,6 +128,29 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
           <span>${fundingMetrics.potentialFunding.toLocaleString()} Potential</span>
         </div>
 
+        {/* Innovations Showcase Trigger */}
+        <button
+          onClick={() => setIsInnovationModalOpen(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            padding: '0.4rem 0.8rem',
+            backgroundColor: 'var(--accent)',
+            color: 'var(--primary)',
+            border: 'none',
+            borderRadius: 'var(--radius-full)',
+            fontSize: '0.8rem',
+            fontWeight: 800,
+            cursor: 'pointer',
+            transition: 'transform 0.15s ease'
+          }}
+          title="Explore GRANTLY 5 Signature Intelligence Innovations"
+        >
+          <Sparkles size={14} />
+          <span>Innovations</span>
+        </button>
+
         {/* Profile Link with Unified Opportunity DNA Completeness */}
         <Link
           to="/profile"
@@ -167,6 +192,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
           </div>
         </Link>
       </div>
+
+      <InnovationHubModal
+        isOpen={isInnovationModalOpen}
+        onClose={() => setIsInnovationModalOpen(false)}
+      />
 
       <style>{`
         @media (max-width: 900px) {

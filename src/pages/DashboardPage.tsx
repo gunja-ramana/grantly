@@ -17,11 +17,13 @@ import { Badge } from '../components/common/Badge';
 import { ProgressBar } from '../components/common/ProgressBar';
 import { ScholarshipCard } from '../components/scholarships/ScholarshipCard';
 import { ScholarshipDetailModal } from '../components/scholarships/ScholarshipDetailModal';
+import { InnovationHubModal } from '../components/common/InnovationHubModal';
 import { Scholarship } from '../types';
 
 export const DashboardPage: React.FC = () => {
   const { state, scholarships, radarItems, fundingMetrics, momentumStats, opportunityDNA, nearestUpcomingDeadline } = useApp();
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
+  const [isInnovationModalOpen, setIsInnovationModalOpen] = useState(false);
 
   // Eligible count
   const eligibleCount = radarItems.filter(r => r.eligibilityReport.status === 'Eligible').length;
@@ -103,6 +105,14 @@ export const DashboardPage: React.FC = () => {
                 Track Applications ({state.applications.length})
               </Button>
             </Link>
+            <Button
+              variant="secondary"
+              onClick={() => setIsInnovationModalOpen(true)}
+              style={{ backgroundColor: 'rgba(200, 237, 121, 0.15)', color: 'var(--accent)', borderColor: 'rgba(200, 237, 121, 0.35)', fontWeight: 700 }}
+              icon={<Sparkles size={17} />}
+            >
+              Explore 5 Innovations
+            </Button>
           </div>
         </div>
 
@@ -486,6 +496,12 @@ export const DashboardPage: React.FC = () => {
         scholarship={selectedScholarship}
         isOpen={Boolean(selectedScholarship)}
         onClose={() => setSelectedScholarship(null)}
+      />
+
+      {/* Innovation Architecture Hub Modal */}
+      <InnovationHubModal
+        isOpen={isInnovationModalOpen}
+        onClose={() => setIsInnovationModalOpen(false)}
       />
     </div>
   );

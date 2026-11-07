@@ -134,13 +134,56 @@ export class StorageService {
         keyCount: localStorage.length,
         isValid: true
       };
-    } catch (e) {
+    } catch {
       return {
         byteSize: 0,
         formattedSize: '0 Bytes',
         keyCount: 0,
         isValid: false
       };
+    }
+  }
+
+  /**
+   * Generates a safe, sanitized JSON export of the current student data
+   */
+  static exportData(): string {
+    const state = this.loadState();
+    return JSON.stringify(state, null, 2);
+  }
+
+  /**
+   * Safely imports and validates imported student data
+   */
+  static importData(rawJson: string): { success: boolean; message: string; state?: AppState } {
+    try {
+      const parsed = JSON.parse(rawJson);
+      if (!parsed || typeof parsed !== 'object') {
+        return { success: false, message: 'Invalid JSON payload structure.' };
+      }
+      if (!parsed.profile || typeof parsed.profile !== 'object') {
+        return { success: false, message: 'Missing student profile in imported file.' };
+      }
+      if (!Array.isArray(parsed.bookmarkedScholarshipIds)) {
+        parsed.bookmarkedScholarshipIds = [];
+      }
+      if (!Array.isArray(parsed.applications)) {
+        parsed.applications = [];
+      }
+      if (!Array.isArray(parsed.documents)) {
+        parsed.documents = [];
+      }
+      if (!parsed.expenses || typeof parsed.expenses !== 'object') {
+        parsed.expenses = INITIAL_STATE.expenses;
+      }
+      parsed.version = CURRENT_VERSION;
+      parsed.profile.profileCompletionPercentage = calculateOpportunityDNA(parsed.profile as StudentProfile).profileCompleteness;
+
+      const saved = this.saveState(parsed as AppState);
+      return { success: true, message: 'Student data successfully imported and verified.', state: saved };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown parsing error';
+      return { success: false, message: `Failed to import data: ${msg}` };
     }
   }
 }

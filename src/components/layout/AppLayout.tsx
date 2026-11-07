@@ -8,6 +8,11 @@ export const AppLayout: React.FC = () => {
 
   return (
     <div className="app-container">
+      {/* Accessible Keyboard Skip Link */}
+      <a href="#main-content-region" className="skip-link">
+        Skip to main content
+      </a>
+
       {/* Desktop Sidebar */}
       <div className="desktop-sidebar-wrapper">
         <Sidebar />
@@ -32,7 +37,7 @@ export const AppLayout: React.FC = () => {
       {/* Main Content Area */}
       <div className="main-content">
         <Navbar onToggleMobileMenu={() => setMobileMenuOpen(prev => !prev)} />
-        <main className="page-wrapper" id="main-content-region">
+        <main className="page-wrapper" id="main-content-region" tabIndex={-1} style={{ outline: 'none' }}>
           <Outlet />
         </main>
       </div>

@@ -289,8 +289,9 @@ export const DocumentVaultPage: React.FC = () => {
         >
           <form onSubmit={handleCreateDocument} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div className="input-group">
-              <label className="input-label">Document Title *</label>
+              <label htmlFor="add-doc-title" className="input-label">Document Title *</label>
               <input
+                id="add-doc-title"
                 type="text"
                 className="input-control"
                 required
@@ -302,8 +303,9 @@ export const DocumentVaultPage: React.FC = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="input-group">
-                <label className="input-label">Document Category *</label>
+                <label htmlFor="add-doc-category" className="input-label">Document Category *</label>
                 <select
+                  id="add-doc-category"
                   className="input-control"
                   value={docCategory}
                   onChange={e => setDocCategory(e.target.value as DocumentCategory)}
@@ -318,8 +320,9 @@ export const DocumentVaultPage: React.FC = () => {
               </div>
 
               <div className="input-group">
-                <label className="input-label">Verification Status</label>
+                <label htmlFor="add-doc-status" className="input-label">Verification Status</label>
                 <select
+                  id="add-doc-status"
                   className="input-control"
                   value={docStatus}
                   onChange={e => setDocStatus(e.target.value as DocumentStatus)}
@@ -332,8 +335,9 @@ export const DocumentVaultPage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">File Name Reference *</label>
+              <label htmlFor="add-doc-filename" className="input-label">File Name Reference *</label>
               <input
+                id="add-doc-filename"
                 type="text"
                 className="input-control"
                 required
@@ -344,8 +348,9 @@ export const DocumentVaultPage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Expiration Date (Optional)</label>
+              <label htmlFor="add-doc-expiry" className="input-label">Expiration Date (Optional)</label>
               <input
+                id="add-doc-expiry"
                 type="date"
                 className="input-control"
                 value={docExpiryDate}
@@ -354,8 +359,9 @@ export const DocumentVaultPage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Verification Notes & Description</label>
+              <label htmlFor="add-doc-notes" className="input-label">Verification Notes & Description</label>
               <textarea
+                id="add-doc-notes"
                 className="input-control"
                 rows={2}
                 placeholder="e.g. Signed by department chair; covers credit hours up to current semester."

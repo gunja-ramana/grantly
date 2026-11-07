@@ -13,6 +13,7 @@ import { ScholarshipDetailModal } from '../components/scholarships/ScholarshipDe
 export const CalendarPage: React.FC = () => {
   const { scholarships, state } = useApp();
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
+  const [calendarView, setCalendarView] = useState<'month' | 'agenda'>('month');
 
   // Month navigation: initialize to November 2026 (matching dataset dates)
   const [currentDate, setCurrentDate] = useState(() => new Date(2026, 10, 1)); // Nov 2026
@@ -87,12 +88,41 @@ export const CalendarPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Month Navigation Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        {/* Month Navigation Controls & View Mode Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+            <button
+              onClick={() => setCalendarView('month')}
+              style={{
+                padding: '0.35rem 0.65rem',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                backgroundColor: calendarView === 'month' ? 'var(--primary-soft)' : '#fff',
+                color: calendarView === 'month' ? 'var(--primary)' : 'var(--text-muted)'
+              }}
+              aria-label="Month Grid View"
+            >
+              Month View
+            </button>
+            <button
+              onClick={() => setCalendarView('agenda')}
+              style={{
+                padding: '0.35rem 0.65rem',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                backgroundColor: calendarView === 'agenda' ? 'var(--primary-soft)' : '#fff',
+                color: calendarView === 'agenda' ? 'var(--primary)' : 'var(--text-muted)'
+              }}
+              aria-label="Agenda List View"
+            >
+              Agenda View
+            </button>
+          </div>
+
           <Button variant="secondary" size="sm" onClick={handlePrevMonth} aria-label="Previous Month">
             <ChevronLeft size={16} />
           </Button>
-          <span style={{ fontSize: '1.05rem', fontWeight: 700, minWidth: '150px', textAlign: 'center' }}>
+          <span style={{ fontSize: '1.05rem', fontWeight: 700, minWidth: '140px', textAlign: 'center' }}>
             {monthNames[currentMonth]} {currentYear}
           </span>
           <Button variant="secondary" size="sm" onClick={handleNextMonth} aria-label="Next Month">
@@ -104,7 +134,64 @@ export const CalendarPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Grid & Upcoming Side Panel */}
+      {calendarView === 'agenda' ? (
+        <div className="card" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+            <Clock size={20} color="var(--primary)" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
+              Chronological Opportunity Deadlines ({upcomingDeadlines.length})
+            </h2>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+            {upcomingDeadlines.map(({ scholarship, daysRemaining, isOverdue, application, isBookmarked }) => (
+              <div
+                key={scholarship.id}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '1rem',
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border-light)',
+                  flexWrap: 'wrap',
+                  gap: '0.75rem'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                    <Badge variant="lavender">{scholarship.category}</Badge>
+                    {isBookmarked && <Badge variant="accent">Saved</Badge>}
+                    {application && <Badge variant="emerald">{application.status}</Badge>}
+                  </div>
+                  <h3
+                    style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)', cursor: 'pointer', margin: '0 0 0.2rem' }}
+                    onClick={() => setSelectedScholarship(scholarship)}
+                  >
+                    {scholarship.title}
+                  </h3>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    {scholarship.provider} • Award: <strong>${scholarship.awardAmount.toLocaleString()}</strong>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>Deadline Date</div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: isOverdue ? 'var(--danger)' : daysRemaining <= 14 ? 'var(--warning)' : 'var(--text)' }}>
+                      {scholarship.applicationDeadline} ({isOverdue ? 'Overdue' : `${daysRemaining}d left`})
+                    </div>
+                  </div>
+                  <Button variant="secondary" size="sm" onClick={() => setSelectedScholarship(scholarship)}>
+                    Details
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+      /* Main Grid & Upcoming Side Panel */
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '1.5rem' }} id="calendar-layout-grid">
         {/* Calendar Card */}
         <div className="card" style={{ padding: '1.25rem' }}>
@@ -285,6 +372,7 @@ export const CalendarPage: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
 
       <style>{`
         @media (max-width: 950px) {

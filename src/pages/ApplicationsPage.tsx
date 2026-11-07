@@ -4,7 +4,9 @@ import {
   Plus,
   Trash2,
   Edit3,
-  AlertTriangle
+  AlertTriangle,
+  LayoutGrid,
+  List
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ApplicationRecord, ApplicationStatus, Scholarship } from '../types';
@@ -20,6 +22,7 @@ export const ApplicationsPage: React.FC = () => {
   const { state, scholarships, updateApplicationStatus, updateApplicationTask, addApplicationTask, deleteApplication } = useApp();
 
   const [activeTab, setActiveTab] = useState<ApplicationStatus | 'All'>('All');
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
   const [selectedScholarshipForModal, setSelectedScholarshipForModal] = useState<Scholarship | null>(null);
 
   // Task management state
@@ -96,11 +99,57 @@ export const ApplicationsPage: React.FC = () => {
             Manage submission milestones, verify checklist requirements, and monitor decision outcomes.
           </p>
         </div>
-        <Link to="/discover">
-          <Button variant="primary" icon={<Plus size={16} />}>
-            Discover More Opportunities
-          </Button>
-        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {/* List vs Kanban Toggle */}
+          <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+            <button
+              onClick={() => setViewMode('list')}
+              className="btn-icon"
+              style={{
+                backgroundColor: viewMode === 'list' ? 'var(--primary-soft)' : '#fff',
+                color: viewMode === 'list' ? 'var(--primary)' : 'var(--text-muted)',
+                borderRadius: 0,
+                padding: '0.45rem 0.75rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.8rem',
+                fontWeight: 600
+              }}
+              title="List View"
+              aria-label="List View"
+            >
+              <List size={16} />
+              <span>List</span>
+            </button>
+            <button
+              onClick={() => setViewMode('kanban')}
+              className="btn-icon"
+              style={{
+                backgroundColor: viewMode === 'kanban' ? 'var(--primary-soft)' : '#fff',
+                color: viewMode === 'kanban' ? 'var(--primary)' : 'var(--text-muted)',
+                borderRadius: 0,
+                padding: '0.45rem 0.75rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.8rem',
+                fontWeight: 600
+              }}
+              title="Kanban Board View"
+              aria-label="Kanban Board View"
+            >
+              <LayoutGrid size={16} />
+              <span>Kanban</span>
+            </button>
+          </div>
+
+          <Link to="/discover">
+            <Button variant="primary" icon={<Plus size={16} />}>
+              Discover Opportunities
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Status Filter Tabs */}
@@ -152,7 +201,7 @@ export const ApplicationsPage: React.FC = () => {
         })}
       </div>
 
-      {/* Applications List */}
+      {/* Applications List or Kanban Board */}
       {filteredApplications.length === 0 ? (
         <EmptyState
           icon={<FileCheck2 size={28} />}
@@ -161,7 +210,162 @@ export const ApplicationsPage: React.FC = () => {
           actionText="Browse Scholarships"
           onAction={() => setActiveTab('All')}
         />
+      ) : viewMode === 'kanban' ? (
+        /* KANBAN BOARD VIEW */
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '1.25rem',
+            alignItems: 'start',
+            overflowX: 'auto',
+            paddingBottom: '1rem'
+          }}
+        >
+          {[
+            { id: 'preparing', title: 'Preparing', statuses: ['Preparing', 'Not Started'], color: 'var(--warning)', bg: 'var(--warning-soft)' },
+            { id: 'ready', title: 'Ready to Submit', statuses: ['Ready to Submit'], color: 'var(--accent-dark)', bg: 'var(--accent-soft)' },
+            { id: 'review', title: 'Under Review', statuses: ['Submitted', 'Under Review'], color: '#9C6710', bg: 'var(--lavender)' },
+            { id: 'approved', title: 'Approved & Won', statuses: ['Approved'], color: 'var(--success)', bg: 'var(--success-soft)' }
+          ].map(col => {
+            const colApps = filteredApplications.filter(a => col.statuses.includes(a.status));
+
+            return (
+              <div
+                key={col.id}
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--border)',
+                  padding: '1rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.85rem',
+                  minWidth: '260px'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: col.color }} />
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
+                      {col.title}
+                    </h3>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      padding: '0.15rem 0.5rem',
+                      borderRadius: 'var(--radius-full)',
+                      backgroundColor: col.bg,
+                      color: col.color
+                    }}
+                  >
+                    {colApps.length}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {colApps.length === 0 ? (
+                    <div
+                      style={{
+                        padding: '1.5rem 1rem',
+                        textAlign: 'center',
+                        fontSize: '0.8rem',
+                        color: 'var(--text-subtle)',
+                        border: '1px dashed var(--border)',
+                        borderRadius: 'var(--radius-md)'
+                      }}
+                    >
+                      No applications currently in {col.title.toLowerCase()}
+                    </div>
+                  ) : (
+                    colApps.map(app => {
+                      const sch = scholarships.find(s => s.id === app.scholarshipId);
+                      const totalTasks = app.tasks.length;
+                      const completedTasks = app.tasks.filter(t => t.completed).length;
+                      const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+                      return (
+                        <div
+                          key={app.id}
+                          className="card"
+                          style={{
+                            padding: '1rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '0.65rem',
+                            backgroundColor: '#FFFFFF'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <Badge variant={getStatusBadgeVariant(app.status)}>{app.status}</Badge>
+                            {sch && <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--primary)' }}>${sch.awardAmount.toLocaleString()}</span>}
+                          </div>
+
+                          <h4
+                            style={{
+                              fontSize: '0.92rem',
+                              fontWeight: 700,
+                              color: 'var(--text)',
+                              margin: '0',
+                              cursor: sch ? 'pointer' : 'default',
+                              lineHeight: 1.35
+                            }}
+                            onClick={() => sch && setSelectedScholarshipForModal(sch)}
+                          >
+                            {sch ? sch.title : 'Application'}
+                          </h4>
+
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                            Due: <strong>{app.targetSubmissionDate}</strong>
+                          </div>
+
+                          <div>
+                            <ProgressBar
+                              value={progress}
+                              sublabel={`${completedTasks}/${totalTasks} tasks`}
+                              variant={progress === 100 ? 'primary' : 'warning'}
+                              height={6}
+                            />
+                          </div>
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem', paddingTop: '0.5rem', borderTop: '1px solid var(--border-light)' }}>
+                            <select
+                              value={app.status}
+                              onChange={e => updateApplicationStatus(app.id, e.target.value as ApplicationStatus)}
+                              className="input-control"
+                              style={{ padding: '0.25rem 1.4rem 0.25rem 0.4rem', fontSize: '0.75rem', width: 'auto' }}
+                              aria-label="Change status"
+                            >
+                              <option value="Preparing">Preparing</option>
+                              <option value="Ready to Submit">Ready</option>
+                              <option value="Submitted">Submitted</option>
+                              <option value="Under Review">Under Review</option>
+                              <option value="Approved">Approved</option>
+                              <option value="Rejected">Rejected</option>
+                            </select>
+
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => handleOpenTaskEditor(app)}
+                              style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
+                            >
+                              Tasks ({completedTasks}/{totalTasks})
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       ) : (
+        /* STANDARD LIST VIEW */
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {filteredApplications.map(app => {
             const sch = scholarships.find(s => s.id === app.scholarshipId);

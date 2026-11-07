@@ -313,8 +313,9 @@ export const FundingInsightsPage: React.FC = () => {
           </h4>
           <div className="grid-3">
             <div className="input-group">
-              <label className="input-label">Tuition & Fees</label>
+              <label htmlFor="expense-tuition" className="input-label">Tuition & Fees</label>
               <input
+                id="expense-tuition"
                 type="number"
                 className="input-control"
                 value={expenses.tuition}
@@ -323,8 +324,9 @@ export const FundingInsightsPage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Accommodation / Housing</label>
+              <label htmlFor="expense-accommodation" className="input-label">Accommodation / Housing</label>
               <input
+                id="expense-accommodation"
                 type="number"
                 className="input-control"
                 value={expenses.accommodation}
@@ -333,8 +335,9 @@ export const FundingInsightsPage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Food & Living Expenses</label>
+              <label htmlFor="expense-living" className="input-label">Food & Living Expenses</label>
               <input
+                id="expense-living"
                 type="number"
                 className="input-control"
                 value={expenses.livingExpenses}
@@ -343,8 +346,9 @@ export const FundingInsightsPage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Books & Course Supplies</label>
+              <label htmlFor="expense-books" className="input-label">Books & Course Supplies</label>
               <input
+                id="expense-books"
                 type="number"
                 className="input-control"
                 value={expenses.booksAndSupplies}
@@ -353,8 +357,9 @@ export const FundingInsightsPage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Travel & Commute</label>
+              <label htmlFor="expense-travel" className="input-label">Travel & Commute</label>
               <input
+                id="expense-travel"
                 type="number"
                 className="input-control"
                 value={expenses.travelAndTransport}
@@ -363,8 +368,9 @@ export const FundingInsightsPage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Health & Other Discretionary</label>
+              <label htmlFor="expense-other" className="input-label">Health & Other Discretionary</label>
               <input
+                id="expense-other"
                 type="number"
                 className="input-control"
                 value={expenses.otherExpenses}

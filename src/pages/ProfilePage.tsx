@@ -123,8 +123,9 @@ export const ProfilePage: React.FC = () => {
           </h3>
           <div className="grid-3">
             <div className="input-group">
-              <label className="input-label">Full Name *</label>
+              <label htmlFor="profile-fullName" className="input-label">Full Name *</label>
               <input
+                id="profile-fullName"
                 type="text"
                 className="input-control"
                 required
@@ -134,8 +135,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Email Address *</label>
+              <label htmlFor="profile-email" className="input-label">Email Address *</label>
               <input
+                id="profile-email"
                 type="email"
                 className="input-control"
                 required
@@ -145,8 +147,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Phone Number</label>
+              <label htmlFor="profile-phone" className="input-label">Phone Number</label>
               <input
+                id="profile-phone"
                 type="text"
                 className="input-control"
                 value={formData.phone}
@@ -155,8 +158,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Citizenship</label>
+              <label htmlFor="profile-citizenship" className="input-label">Citizenship</label>
               <input
+                id="profile-citizenship"
                 type="text"
                 className="input-control"
                 value={formData.citizenship}
@@ -165,8 +169,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Country of Residence</label>
+              <label htmlFor="profile-residenceCountry" className="input-label">Country of Residence</label>
               <input
+                id="profile-residenceCountry"
                 type="text"
                 className="input-control"
                 value={formData.residenceCountry}
@@ -175,8 +180,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">State / Province</label>
+              <label htmlFor="profile-stateProvince" className="input-label">State / Province</label>
               <input
+                id="profile-stateProvince"
                 type="text"
                 className="input-control"
                 value={formData.stateProvince}
@@ -193,8 +199,9 @@ export const ProfilePage: React.FC = () => {
           </h3>
           <div className="grid-3">
             <div className="input-group">
-              <label className="input-label">Education Level *</label>
+              <label htmlFor="profile-educationLevel" className="input-label">Education Level *</label>
               <select
+                id="profile-educationLevel"
                 className="input-control"
                 value={formData.educationLevel}
                 onChange={e => handleChange('educationLevel', e.target.value as EducationLevel)}
@@ -207,8 +214,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Field of Study / Major *</label>
+              <label htmlFor="profile-fieldOfStudy" className="input-label">Field of Study / Major *</label>
               <input
+                id="profile-fieldOfStudy"
                 type="text"
                 className="input-control"
                 required
@@ -218,8 +226,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">University / Institution *</label>
+              <label htmlFor="profile-institution" className="input-label">University / Institution *</label>
               <input
+                id="profile-institution"
                 type="text"
                 className="input-control"
                 required
@@ -229,8 +238,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Cumulative GPA (e.g. 3.75) *</label>
+              <label htmlFor="profile-gpa" className="input-label">Cumulative GPA (e.g. 3.75) *</label>
               <input
+                id="profile-gpa"
                 type="number"
                 step="0.01"
                 min="0"
@@ -243,8 +253,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">GPA Scale (Max)</label>
+              <label htmlFor="profile-maxGpa" className="input-label">GPA Scale (Max)</label>
               <input
+                id="profile-maxGpa"
                 type="number"
                 step="0.1"
                 className="input-control"
@@ -254,8 +265,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Anticipated Graduation Year</label>
+              <label htmlFor="profile-graduationYear" className="input-label">Anticipated Graduation Year</label>
               <input
+                id="profile-graduationYear"
                 type="number"
                 className="input-control"
                 value={formData.graduationYear}
@@ -272,8 +284,9 @@ export const ProfilePage: React.FC = () => {
           </h3>
           <div className="grid-2" style={{ marginBottom: '1rem' }}>
             <div className="input-group">
-              <label className="input-label">Annual Family Gross Income ($ USD) *</label>
+              <label htmlFor="profile-annualFamilyIncome" className="input-label">Annual Family Gross Income ($ USD) *</label>
               <input
+                id="profile-annualFamilyIncome"
                 type="number"
                 className="input-control"
                 value={formData.annualFamilyIncome}
@@ -285,8 +298,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Household Size (Dependents)</label>
+              <label htmlFor="profile-householdSize" className="input-label">Household Size (Dependents)</label>
               <input
+                id="profile-householdSize"
                 type="number"
                 min="1"
                 className="input-control"
@@ -298,6 +312,7 @@ export const ProfilePage: React.FC = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
             <label
+              htmlFor="profile-firstGeneration"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -309,6 +324,7 @@ export const ProfilePage: React.FC = () => {
               }}
             >
               <input
+                id="profile-firstGeneration"
                 type="checkbox"
                 checked={formData.firstGenerationStudent}
                 onChange={e => handleChange('firstGenerationStudent', e.target.checked)}
@@ -318,6 +334,7 @@ export const ProfilePage: React.FC = () => {
             </label>
 
             <label
+              htmlFor="profile-minority"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -329,6 +346,7 @@ export const ProfilePage: React.FC = () => {
               }}
             >
               <input
+                id="profile-minority"
                 type="checkbox"
                 checked={formData.minorityStatus}
                 onChange={e => handleChange('minorityStatus', e.target.checked)}
@@ -338,6 +356,7 @@ export const ProfilePage: React.FC = () => {
             </label>
 
             <label
+              htmlFor="profile-disability"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -349,6 +368,7 @@ export const ProfilePage: React.FC = () => {
               }}
             >
               <input
+                id="profile-disability"
                 type="checkbox"
                 checked={formData.disabilityStatus}
                 onChange={e => handleChange('disabilityStatus', e.target.checked)}
@@ -361,8 +381,9 @@ export const ProfilePage: React.FC = () => {
 
         {/* Section 4: Narrative Statement */}
         <div className="input-group">
-          <label className="input-label">Academic & Career Goals Statement</label>
+          <label htmlFor="profile-bioStatement" className="input-label">Academic & Career Goals Statement</label>
           <textarea
+            id="profile-bioStatement"
             className="input-control"
             rows={3}
             value={formData.bioStatement}

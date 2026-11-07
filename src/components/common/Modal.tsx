@@ -22,20 +22,74 @@ export const Modal: React.FC<ModalProps> = ({
   maxWidth = '680px'
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    if (!isOpen) return;
+
+    // Capture the element that held focus before opening
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = 'hidden';
+
+    // Focus the modal or its first interactive element
+    const timeoutId = setTimeout(() => {
+      if (modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length > 0) {
+          focusable[0].focus();
+        } else {
+          modalRef.current.focus();
+        }
+      }
+    }, 50);
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
         onClose();
+        return;
+      }
+
+      // Keyboard Focus Trap
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableElements = Array.from(
+          modalRef.current.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        );
+
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
     return () => {
+      clearTimeout(timeoutId);
       document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
+
+      // Restore previous focus upon closing
+      if (previousFocusRef.current && typeof previousFocusRef.current.focus === 'function') {
+        previousFocusRef.current.focus();
+      }
     };
   }, [isOpen, onClose]);
 
@@ -52,11 +106,13 @@ export const Modal: React.FC<ModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
+      aria-describedby={subtitle ? 'modal-desc' : undefined}
     >
       <div
         className="modal-content"
         ref={modalRef}
-        style={{ maxWidth }}
+        tabIndex={-1}
+        style={{ maxWidth, outline: 'none' }}
         onClick={e => e.stopPropagation()}
       >
         <div
@@ -73,11 +129,11 @@ export const Modal: React.FC<ModalProps> = ({
           }}
         >
           <div>
-            <h3 id="modal-title" style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
+            <h3 id="modal-title" style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
               {title}
             </h3>
             {subtitle && (
-              <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              <p id="modal-desc" style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                 {subtitle}
               </p>
             )}
@@ -86,7 +142,7 @@ export const Modal: React.FC<ModalProps> = ({
             variant="icon"
             onClick={onClose}
             aria-label="Close dialog"
-            style={{ padding: '0.4rem', color: 'var(--text-subtle)' }}
+            style={{ padding: '0.4rem', color: 'var(--text-muted)' }}
           >
             <X size={20} />
           </Button>
