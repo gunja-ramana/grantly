@@ -132,8 +132,8 @@ export const FundingInsightsPage: React.FC = () => {
         </span>
       </AlertBanner>
 
-      {/* Top 5 Real Financial Lifecycle Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+      {/* Top 5 Real Financial Lifecycle Metrics - Responsive Class Grid */}
+      <div className="funding-kpi-grid">
         <div className="card" style={{ padding: '1.25rem' }}>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Need (Annual Expenses)</span>
           <div style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text)', marginTop: '0.35rem' }}>
@@ -179,10 +179,10 @@ export const FundingInsightsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Recharts Analytics Charts */}
+      {/* Recharts Analytics Charts - Constrained and Responsive */}
       <div className="grid-2">
         {/* Pipeline Bar Chart */}
-        <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+        <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', minWidth: 0, width: '100%', overflow: 'hidden' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>
             Funding Pipeline Breakdown
           </h3>
@@ -190,15 +190,17 @@ export const FundingInsightsPage: React.FC = () => {
             Comparison of annual education need versus discovery potential and confirmed disbursements.
           </p>
 
-          <div style={{ height: '280px', width: '100%' }}>
+          <div className="chart-container-wrapper">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pipelineData} margin={{ top: 10, right: 10, left: 10, bottom: 25 }}>
+              <BarChart data={pipelineData} margin={{ top: 10, right: 10, left: 10, bottom: 35 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
                 <XAxis
                   dataKey="stage"
-                  tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
-                  angle={-15}
+                  tick={{ fontSize: 10, fill: 'var(--text-muted)' }}
+                  angle={-20}
                   textAnchor="end"
+                  height={45}
+                  interval={0}
                 />
                 <YAxis
                   tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
@@ -220,7 +222,7 @@ export const FundingInsightsPage: React.FC = () => {
         </div>
 
         {/* Category Share Pie Chart */}
-        <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+        <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', minWidth: 0, width: '100%', overflow: 'hidden' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>
             Tracked Value by Category
           </h3>
@@ -233,7 +235,7 @@ export const FundingInsightsPage: React.FC = () => {
               No scholarships tracked yet.
             </div>
           ) : (
-            <div style={{ height: '280px', width: '100%' }}>
+            <div className="chart-container-wrapper">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -380,7 +382,7 @@ export const FundingInsightsPage: React.FC = () => {
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.85rem' }}>
             Green Horizons ($8,500) is confirmed received. Toggle other pipeline opportunities to see how new awards close your remaining $27,000 deficit.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '0.75rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(260px, 100%), 1fr))', gap: '0.75rem', width: '100%', minWidth: 0 }}>
             {scholarships.map(sch => {
               const isChecked = scenarioScholarshipIds.includes(sch.id);
               const isReceived = state.applications.find(a => a.scholarshipId === sch.id)?.status === 'Approved';
@@ -395,19 +397,21 @@ export const FundingInsightsPage: React.FC = () => {
                     backgroundColor: isChecked ? 'var(--primary-soft)' : 'var(--surface-subtle)',
                     border: isChecked ? '1px solid var(--primary)' : '1px solid var(--border)',
                     borderRadius: 'var(--radius-md)',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    minWidth: 0,
+                    boxSizing: 'border-box'
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0 }}>
                     <input
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleScenarioScholarship(sch.id)}
-                      style={{ accentColor: 'var(--primary)' }}
+                      style={{ accentColor: 'var(--primary)', flexShrink: 0 }}
                     />
-                    <div>
-                      <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)' }}>
-                        {sch.title.length > 24 ? `${sch.title.substring(0, 24)}...` : sch.title}
+                    <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
+                        {sch.title}
                       </div>
                       {isReceived && (
                         <span style={{ fontSize: '0.7rem', color: 'var(--success)', fontWeight: 700 }}>
@@ -416,7 +420,7 @@ export const FundingInsightsPage: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)', flexShrink: 0, marginLeft: '0.5rem' }}>
                     ${sch.awardAmount.toLocaleString()}
                   </span>
                 </label>

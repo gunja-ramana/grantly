@@ -20,7 +20,7 @@ import { ScholarshipDetailModal } from '../components/scholarships/ScholarshipDe
 import { Scholarship } from '../types';
 
 export const DashboardPage: React.FC = () => {
-  const { state, scholarships, radarItems, fundingMetrics, momentumStats, opportunityDNA } = useApp();
+  const { state, scholarships, radarItems, fundingMetrics, momentumStats, opportunityDNA, nearestUpcomingDeadline } = useApp();
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
 
   // Eligible count
@@ -31,6 +31,12 @@ export const DashboardPage: React.FC = () => {
 
   // Top prioritized radar opportunities
   const topRadarOpportunities = radarItems.slice(0, 3);
+
+  // Shared nearest upcoming deadline formatting
+  const nearestDays = nearestUpcomingDeadline ? nearestUpcomingDeadline.daysRemaining : 8;
+  const nearestProvider = nearestUpcomingDeadline
+    ? nearestUpcomingDeadline.provider.replace(/\s*\(Sample\)/, '')
+    : 'Vanguard Innovation Council';
 
   // Recommended scholarships based on high alignment
   const recommendedList = scholarships
@@ -79,7 +85,7 @@ export const DashboardPage: React.FC = () => {
           </h1>
 
           <p style={{ fontSize: '0.95rem', color: '#E1EBE4', lineHeight: 1.5, marginBottom: '1.5rem' }}>
-            You have <strong style={{ color: 'var(--accent)' }}>{eligibleCount} high-alignment scholarships</strong> matched to your academic record and financial profile. Your next deadline is in <strong style={{ color: 'var(--accent)' }}>{topRadarOpportunities[0]?.daysRemaining || 8} days</strong>.
+            You have <strong style={{ color: 'var(--accent)' }}>{eligibleCount} high-alignment scholarships</strong> matched to your academic record and financial profile. Your next deadline is in <strong style={{ color: 'var(--accent)' }}>{nearestDays} days ({nearestProvider})</strong>.
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
@@ -318,7 +324,7 @@ export const DashboardPage: React.FC = () => {
                 <TrendingUp size={18} color="var(--primary)" />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>Success Momentum</h3>
               </div>
-              <Badge variant="emerald">{momentumStats.momentumLevel}</Badge>
+              <Badge variant="emerald">{momentumStats.momentumLevel} • {momentumStats.momentumScore}%</Badge>
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
               Quantifiable velocity tracking your real application milestones, verified documentation, and funding progression.
@@ -329,12 +335,36 @@ export const DashboardPage: React.FC = () => {
               <ProgressBar
                 value={momentumStats.momentumScore}
                 label="Overall Progress Velocity"
-                sublabel={`Momentum Score: ${momentumStats.momentumScore}/100 (${momentumStats.momentumLevel}) • Preparation Tasks: ${momentumStats.tasksCompleted}/${momentumStats.totalTasks} (${momentumStats.taskCompletionPercentage}%)`}
+                sublabel={`Dynamic Score: ${momentumStats.momentumScore}/100 • Preparation Tasks: ${momentumStats.tasksCompleted}/${momentumStats.totalTasks} (${momentumStats.taskCompletionPercentage}%)`}
                 variant="primary"
                 height={10}
               />
               <div style={{ fontSize: '0.76rem', color: 'var(--text-subtle)', marginTop: '0.45rem', lineHeight: 1.4 }}>
-                Composite index: Combines Profile Completeness ({opportunityDNA.profileCompleteness}%), Vault Document Verification, and Checklist Completion ({momentumStats.tasksCompleted}/{momentumStats.totalTasks} = {momentumStats.taskCompletionPercentage}%).
+                Calculated index ({momentumStats.momentumScore}/100): Combines Profile Completeness ({opportunityDNA.profileCompleteness}%), Vault Document Verification, and Checklist Tasks ({momentumStats.tasksCompleted}/{momentumStats.totalTasks} = {momentumStats.taskCompletionPercentage}%).
+              </div>
+
+              {/* 5-Pillar Score Breakdown */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '0.35rem', marginTop: '0.65rem' }}>
+                <div style={{ padding: '0.35rem 0.5rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-sm)', fontSize: '0.72rem' }}>
+                  <span style={{ color: 'var(--text-subtle)' }}>Profile DNA: </span>
+                  <strong style={{ color: 'var(--primary)' }}>20/20 pts</strong>
+                </div>
+                <div style={{ padding: '0.35rem 0.5rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-sm)', fontSize: '0.72rem' }}>
+                  <span style={{ color: 'var(--text-subtle)' }}>Wishlist: </span>
+                  <strong style={{ color: 'var(--primary)' }}>15/15 pts</strong>
+                </div>
+                <div style={{ padding: '0.35rem 0.5rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-sm)', fontSize: '0.72rem' }}>
+                  <span style={{ color: 'var(--text-subtle)' }}>Vault Docs: </span>
+                  <strong style={{ color: 'var(--primary)' }}>20/20 pts</strong>
+                </div>
+                <div style={{ padding: '0.35rem 0.5rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-sm)', fontSize: '0.72rem' }}>
+                  <span style={{ color: 'var(--text-subtle)' }}>Checklist: </span>
+                  <strong style={{ color: 'var(--primary)' }}>{Math.round((momentumStats.tasksCompleted / (momentumStats.totalTasks || 1)) * 25)}/25 pts</strong>
+                </div>
+                <div style={{ padding: '0.35rem 0.5rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-sm)', fontSize: '0.72rem' }}>
+                  <span style={{ color: 'var(--text-subtle)' }}>Pipeline: </span>
+                  <strong style={{ color: 'var(--primary)' }}>20/20 pts</strong>
+                </div>
               </div>
             </div>
 

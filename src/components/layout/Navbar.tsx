@@ -8,14 +8,8 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
-  const { state, fundingMetrics, radarItems, opportunityDNA } = useApp();
+  const { state, fundingMetrics, opportunityDNA, nearestUpcomingDeadline } = useApp();
   const location = useLocation();
-
-  // Find nearest upcoming deadline
-  const upcomingRadar = radarItems.filter(r => !r.isOverdue && r.daysRemaining >= 0);
-  const nextItem = upcomingRadar.length > 0
-    ? upcomingRadar.reduce((prev, curr) => curr.daysRemaining < prev.daysRemaining ? curr : prev)
-    : null;
 
   const getPageTitle = () => {
     switch (location.pathname) {
@@ -69,8 +63,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
 
       {/* Right Stats & Profile Quick Actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-        {/* Next Urgent Deadline Pill */}
-        {nextItem && (
+        {/* Next Urgent Deadline Pill - Shared Single Source of Truth */}
+        {nearestUpcomingDeadline && (
           <div
             style={{
               display: 'flex',
@@ -84,10 +78,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
               color: '#9C6710',
               fontWeight: 600
             }}
-            title={`Next deadline: ${nextItem.scholarship.title} on ${nextItem.scholarship.applicationDeadline}`}
+            title={`Next deadline: ${nearestUpcomingDeadline.scholarshipTitle} on ${nearestUpcomingDeadline.deadlineDate}`}
           >
             <Calendar size={14} />
-            <span>Next: {nextItem.daysRemaining}d ({nextItem.scholarship.provider.replace(/\s*\(Sample\)/, '').substring(0, 14)}...)</span>
+            <span>Next: {nearestUpcomingDeadline.daysRemaining}d ({nearestUpcomingDeadline.provider.replace(/\s*\(Sample\)/, '').substring(0, 14)}...)</span>
           </div>
         )}
 

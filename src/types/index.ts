@@ -192,6 +192,15 @@ export interface OpportunityRadarItem {
   applicationStatus?: ApplicationStatus;
 }
 
+export interface NearestUpcomingDeadline {
+  item: OpportunityRadarItem;
+  daysRemaining: number;
+  scholarshipTitle: string;
+  provider: string;
+  deadlineDate: string;
+  awardAmount: number;
+}
+
 export interface ActivityItem {
   id: string;
   timestamp: string;

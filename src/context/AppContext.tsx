@@ -9,7 +9,8 @@ import {
   ActivityItem,
   ApplicationStatus,
   OpportunityRadarItem,
-  ApplicationTask
+  ApplicationTask,
+  NearestUpcomingDeadline
 } from '../types';
 import { StorageService } from '../services/storage';
 import { MOCK_SCHOLARSHIPS } from '../data/mockScholarships';
@@ -25,6 +26,7 @@ interface AppContextValue {
   fundingMetrics: FundingMetrics;
   momentumStats: StudentMomentumStats;
   opportunityDNA: ReturnType<typeof calculateOpportunityDNA>;
+  nearestUpcomingDeadline: NearestUpcomingDeadline | null;
   // Actions
   toggleBookmark: (scholarshipId: string) => void;
   updateProfile: (updatedProfile: Partial<StudentProfile>) => void;
@@ -453,6 +455,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   }, [state.profile, state.bookmarkedScholarshipIds, state.applications, state.documents]);
 
+  // Shared single source of truth for nearest upcoming deadline
+  const nearestUpcomingDeadline = useMemo<NearestUpcomingDeadline | null>(() => {
+    const upcoming = radarItems.filter(r => !r.isOverdue && r.daysRemaining >= 0);
+    if (upcoming.length === 0) return null;
+    const nearest = upcoming.reduce((prev, curr) => (curr.daysRemaining < prev.daysRemaining ? curr : prev));
+    return {
+      item: nearest,
+      daysRemaining: nearest.daysRemaining,
+      scholarshipTitle: nearest.scholarship.title,
+      provider: nearest.scholarship.provider,
+      deadlineDate: nearest.scholarship.applicationDeadline,
+      awardAmount: nearest.scholarship.awardAmount
+    };
+  }, [radarItems]);
+
   const value: AppContextValue = {
     state,
     scholarships,
@@ -460,6 +477,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     fundingMetrics,
     momentumStats,
     opportunityDNA,
+    nearestUpcomingDeadline,
     toggleBookmark,
     updateProfile,
     addApplication,

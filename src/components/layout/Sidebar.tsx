@@ -169,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
             Momentum: {momentumStats.momentumLevel}
           </span>
           <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--secondary)' }}>
-            {momentumStats.momentumScore}/100
+            {momentumStats.momentumScore}% ({momentumStats.momentumScore}/100)
           </span>
         </div>
         <div
