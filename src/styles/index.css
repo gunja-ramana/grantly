@@ -211,6 +211,7 @@ html, body {
   gap: 0.5rem;
   font-weight: 600;
   font-size: 0.9rem;
+  min-height: 44px;
   padding: 0.6rem 1.15rem;
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
@@ -273,6 +274,11 @@ html, body {
 }
 
 .btn-icon {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0.5rem;
   border-radius: var(--radius-md);
   color: var(--text-muted);
@@ -326,7 +332,7 @@ html, body {
 
 .badge-warning {
   background-color: var(--warning-soft);
-  color: #9C6710;
+  color: var(--warning-text);
 }
 
 .badge-danger {

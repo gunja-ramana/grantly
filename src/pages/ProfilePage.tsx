@@ -70,6 +70,7 @@ export const ProfilePage: React.FC = () => {
           <ProgressBar
             value={opportunityDNA.profileCompleteness}
             label="Profile Completion Score"
+            ariaLabel="Student Profile Completion Score"
             sublabel={
               opportunityDNA.missingFields.length > 0
                 ? `Missing fields: ${opportunityDNA.missingFields.join(', ')}`

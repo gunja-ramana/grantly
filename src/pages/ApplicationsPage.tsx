@@ -324,6 +324,7 @@ export const ApplicationsPage: React.FC = () => {
                           <div>
                             <ProgressBar
                               value={progress}
+                              ariaLabel={`${sch ? sch.title : 'Application'} checklist progress`}
                               sublabel={`${completedTasks}/${totalTasks} tasks`}
                               variant={progress === 100 ? 'primary' : 'warning'}
                               height={6}
@@ -457,6 +458,7 @@ export const ApplicationsPage: React.FC = () => {
                   <ProgressBar
                     value={progress}
                     label="Copilot Preparation Progress"
+                    ariaLabel={`${sch ? sch.title : 'Application'} Copilot Preparation Progress`}
                     sublabel={`${completedTasks} of ${totalTasks} requirements fulfilled`}
                     variant={progress === 100 ? 'primary' : 'warning'}
                     height={8}

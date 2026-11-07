@@ -178,7 +178,7 @@ export const CalendarPage: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>Deadline Date</div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: isOverdue ? 'var(--danger)' : daysRemaining <= 14 ? 'var(--warning)' : 'var(--text)' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: isOverdue ? 'var(--danger)' : daysRemaining <= 14 ? 'var(--warning-text)' : 'var(--text)' }}>
                       {scholarship.applicationDeadline} ({isOverdue ? 'Overdue' : `${daysRemaining}d left`})
                     </div>
                   </div>
@@ -351,7 +351,7 @@ export const CalendarPage: React.FC = () => {
                     style={{
                       fontSize: '0.75rem',
                       fontWeight: 700,
-                      color: isOverdue ? 'var(--danger)' : daysRemaining <= 14 ? 'var(--warning)' : 'var(--text)'
+                      color: isOverdue ? 'var(--danger)' : daysRemaining <= 14 ? 'var(--warning-text)' : 'var(--text)'
                     }}
                   >
                     {scholarship.applicationDeadline} ({isOverdue ? 'Overdue' : `${daysRemaining}d remaining`})

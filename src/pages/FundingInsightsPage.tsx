@@ -470,6 +470,7 @@ export const FundingInsightsPage: React.FC = () => {
           <ProgressBar
             value={scenarioCoveragePercent}
             label="Hypothetical Education Cost Coverage"
+            ariaLabel="Hypothetical Education Cost Coverage Percentage"
             sublabel={
               scenarioRemainingGap === 0
                 ? 'Congratulations! This hypothetical combination covers 100% of your annual expenses.'

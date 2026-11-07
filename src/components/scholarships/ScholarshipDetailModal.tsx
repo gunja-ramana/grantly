@@ -137,7 +137,7 @@ export const ScholarshipDetailModal: React.FC<ScholarshipDetailModalProps> = ({
 
         <div style={{ padding: '0.85rem', backgroundColor: 'var(--surface-subtle)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', fontWeight: 600 }}>APPLICATION DEADLINE</div>
-          <div style={{ fontSize: '1.15rem', fontWeight: 700, color: daysRemaining <= 14 ? 'var(--warning)' : 'var(--text)' }}>
+          <div style={{ fontSize: '1.15rem', fontWeight: 700, color: daysRemaining <= 14 ? 'var(--warning-text)' : 'var(--text)' }}>
             {scholarship.applicationDeadline}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -373,6 +373,7 @@ export const ScholarshipDetailModal: React.FC<ScholarshipDetailModalProps> = ({
             <ProgressBar
               value={copilot.readinessPercentage}
               label="Application Readiness Score"
+              ariaLabel="Application Readiness Score"
               sublabel={copilot.submissionReadinessStatement}
               variant={copilot.readinessPercentage >= 80 ? 'primary' : 'warning'}
               height={10}

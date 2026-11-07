@@ -74,11 +74,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
               gap: '0.4rem',
               padding: '0.4rem 0.75rem',
               backgroundColor: 'var(--warning-soft)',
-              border: '1px solid rgba(214, 154, 56, 0.25)',
+              border: '1px solid rgba(122, 73, 0, 0.25)',
               borderRadius: 'var(--radius-full)',
               fontSize: '0.78rem',
-              color: '#9C6710',
-              fontWeight: 600
+              color: 'var(--warning-text)',
+              fontWeight: 700
             }}
             title={`Next deadline: ${nearestUpcomingDeadline.scholarshipTitle} on ${nearestUpcomingDeadline.deadlineDate}`}
           >
@@ -100,7 +100,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
               fontSize: '0.8rem',
               color: 'var(--success)',
               fontWeight: 700,
-              border: '1px solid rgba(37, 132, 90, 0.2)'
+              border: '1px solid rgba(22, 101, 52, 0.25)'
             }}
             title={`Confirmed received disbursements: $${fundingMetrics.receivedFunding.toLocaleString()}`}
           >

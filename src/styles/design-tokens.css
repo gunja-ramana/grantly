@@ -21,19 +21,20 @@
   --lavender-soft: #F6F4FC;
   
   --text: #202B26;
-  --text-muted: #4B5A51;
-  --text-subtle: #5A6B62;
+  --text-muted: #3D4C43;
+  --text-subtle: #4D5E55;
   --text-light: #FFFFFF;
   
   --border: #E2E7E0;
   --border-light: #EDF1EB;
   --border-focus: #174C3A;
   
-  --success: #25845A;
+  --success: #166534;
   --success-soft: #E6F5EE;
   --warning: #D69A38;
+  --warning-text: #7A4900;
   --warning-soft: #FDF6EA;
-  --danger: #CE5A5A;
+  --danger: #B91C1C;
   --danger-soft: #FCEFEF;
   --info: #2B6CB0;
   --info-soft: #EBF4FC;

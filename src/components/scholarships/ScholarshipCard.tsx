@@ -116,7 +116,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
               style={{
                 fontSize: '0.9rem',
                 fontWeight: 700,
-                color: isOverdue ? 'var(--danger)' : daysRemaining <= 14 ? '#9C6710' : 'var(--text)'
+                color: isOverdue ? 'var(--danger)' : daysRemaining <= 14 ? 'var(--warning-text)' : 'var(--text)'
               }}
             >
               {isOverdue ? 'Overdue' : `${daysRemaining} days left`}
@@ -234,7 +234,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem' }}>
             <span style={{ color: 'var(--text-subtle)' }}>Award Amount:</span>
             <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1rem' }}>
-              ${scholarship.awardAmount.toLocaleString()} <span style={{ fontSize: '0.72rem', fontWeight: 500 }}>({scholarship.awardFrequency})</span>
+              ${scholarship.awardAmount.toLocaleString()} <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)' }}>({scholarship.awardFrequency})</span>
             </span>
           </div>
 
@@ -243,7 +243,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
             <span
               style={{
                 fontWeight: 700,
-                color: isOverdue ? 'var(--danger)' : daysRemaining <= 14 ? '#9C6710' : 'var(--text)'
+                color: isOverdue ? 'var(--danger)' : daysRemaining <= 14 ? 'var(--warning-text)' : 'var(--text)'
               }}
             >
               {scholarship.applicationDeadline} ({isOverdue ? 'Passed' : `${daysRemaining}d`})

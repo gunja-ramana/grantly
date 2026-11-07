@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 interface ProgressBarProps {
   value: number; // 0 to 100
@@ -7,6 +7,8 @@ interface ProgressBarProps {
   variant?: 'primary' | 'accent' | 'warning' | 'danger';
   height?: number;
   showPercentText?: boolean;
+  ariaLabel?: string;
+  id?: string;
 }
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
@@ -15,9 +17,14 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   sublabel,
   variant = 'primary',
   height = 8,
-  showPercentText = true
+  showPercentText = true,
+  ariaLabel,
+  id
 }) => {
   const clampedValue = Math.min(100, Math.max(0, value));
+  const generatedId = useId();
+  const labelElementId = id || `progress-label-${generatedId.replace(/:/g, '')}`;
+  const accessibleName = ariaLabel || label || 'Progress';
 
   const getColor = () => {
     switch (variant) {
@@ -33,7 +40,10 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       {(label || showPercentText) && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
           {label && (
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)' }}>
+            <span
+              id={labelElementId}
+              style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)' }}
+            >
               {label}
             </span>
           )}
@@ -49,6 +59,8 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         aria-valuenow={clampedValue}
         aria-valuemin={0}
         aria-valuemax={100}
+        aria-label={accessibleName}
+        {...(label ? { 'aria-labelledby': labelElementId } : {})}
         style={{
           width: '100%',
           height: `${height}px`,

@@ -90,17 +90,27 @@ export const DashboardPage: React.FC = () => {
             You have <strong style={{ color: 'var(--accent)' }}>{eligibleCount} high-alignment scholarships</strong> matched to your academic record and financial profile. Your next deadline is in <strong style={{ color: 'var(--accent)' }}>{nearestDays} days ({nearestProvider})</strong>.
           </p>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-            <Link to="/discover">
-              <Button variant="accent" icon={<Compass size={17} />}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', alignItems: 'center' }}>
+            <Link to="/discover" style={{ textDecoration: 'none' }}>
+              <Button
+                variant="accent"
+                icon={<Compass size={18} />}
+                style={{ minHeight: '44px', padding: '0.7rem 1.35rem' }}
+              >
                 Explore Matched Scholarships
               </Button>
             </Link>
-            <Link to="/applications">
+            <Link to="/applications" style={{ textDecoration: 'none' }}>
               <Button
                 variant="secondary"
-                style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.2)' }}
-                icon={<FileCheck2 size={17} />}
+                style={{
+                  minHeight: '44px',
+                  padding: '0.7rem 1.35rem',
+                  backgroundColor: 'rgba(255,255,255,0.12)',
+                  color: '#FFFFFF',
+                  borderColor: 'rgba(255,255,255,0.2)'
+                }}
+                icon={<FileCheck2 size={18} />}
               >
                 Track Applications ({state.applications.length})
               </Button>
@@ -108,8 +118,15 @@ export const DashboardPage: React.FC = () => {
             <Button
               variant="secondary"
               onClick={() => setIsInnovationModalOpen(true)}
-              style={{ backgroundColor: 'rgba(200, 237, 121, 0.15)', color: 'var(--accent)', borderColor: 'rgba(200, 237, 121, 0.35)', fontWeight: 700 }}
-              icon={<Sparkles size={17} />}
+              style={{
+                minHeight: '44px',
+                padding: '0.7rem 1.35rem',
+                backgroundColor: 'rgba(200, 237, 121, 0.15)',
+                color: 'var(--accent)',
+                borderColor: 'rgba(200, 237, 121, 0.35)',
+                fontWeight: 700
+              }}
+              icon={<Sparkles size={18} />}
             >
               Explore 5 Innovations
             </Button>
@@ -293,7 +310,7 @@ export const DashboardPage: React.FC = () => {
                   </div>
 
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.45rem' }}>
-                    <strong>${item.scholarship.awardAmount.toLocaleString()}</strong> • {item.scholarship.provider} • <span style={{ color: item.daysRemaining <= 14 ? 'var(--warning)' : 'var(--text-muted)', fontWeight: 600 }}>{item.daysRemaining} days left</span>
+                    <strong>${item.scholarship.awardAmount.toLocaleString()}</strong> • {item.scholarship.provider} • <span style={{ color: item.daysRemaining <= 14 ? 'var(--warning-text)' : 'var(--text-muted)', fontWeight: 700 }}>{item.daysRemaining} days left</span>
                   </div>
 
                   <div
@@ -345,6 +362,7 @@ export const DashboardPage: React.FC = () => {
               <ProgressBar
                 value={momentumStats.momentumScore}
                 label="Overall Progress Velocity"
+                ariaLabel="Student Success Momentum Progress"
                 sublabel={`Dynamic Score: ${momentumStats.momentumScore}/100 • Preparation Tasks: ${momentumStats.tasksCompleted}/${momentumStats.totalTasks} (${momentumStats.taskCompletionPercentage}%)`}
                 variant="primary"
                 height={10}
