@@ -1,12 +1,110 @@
-import { Scholarship, StudentProfile, VaultDocument, ApplicationRecord, ApplicationTask } from '../../types';
+import {
+  Scholarship,
+  StudentProfile,
+  VaultDocument,
+  ApplicationRecord,
+  ApplicationTask,
+  DocumentRequirementItem
+} from '../../types';
+
+/**
+ * Matches a required scholarship document against the student's Document Vault
+ * enforcing strict category and title affinity.
+ */
+export function matchDocumentToRequirement(
+  reqName: string,
+  vaultDocs: VaultDocument[]
+): DocumentRequirementItem {
+  const reqLower = reqName.toLowerCase();
+
+  // Find candidate by category affinity or title matching
+  const candidate = vaultDocs.find(doc => {
+    const titleLower = doc.title.toLowerCase();
+    const fileLower = doc.fileName.toLowerCase();
+
+    // 1. Transcript / Academic
+    if (reqLower.includes('transcript') || reqLower.includes('academic record') || reqLower.includes('report card')) {
+      return doc.category === 'Academic' || titleLower.includes('transcript') || fileLower.includes('transcript');
+    }
+
+    // 2. Income / Financial Proof / FAFSA / Tax
+    if (reqLower.includes('income') || reqLower.includes('fafsa') || reqLower.includes('tax') || reqLower.includes('hardship')) {
+      return doc.category === 'Income' || titleLower.includes('income') || titleLower.includes('tax') || fileLower.includes('tax');
+    }
+
+    // 3. Recommendation Letters / References
+    if (reqLower.includes('recommendation') || reqLower.includes('reference') || reqLower.includes('endorsement')) {
+      return doc.category === 'Recommendation' || titleLower.includes('recommendation') || fileLower.includes('recommendation');
+    }
+
+    // 4. Statement of Purpose / Essays / Portfolio
+    if (reqLower.includes('statement') || reqLower.includes('essay') || reqLower.includes('purpose') || reqLower.includes('portfolio') || reqLower.includes('proposal')) {
+      return doc.category === 'Personal Statement' || titleLower.includes('statement') || titleLower.includes('essay') || titleLower.includes('proposal');
+    }
+
+    // 5. Identity / First-Gen / Citizenship / Status
+    if (reqLower.includes('first-generation') || reqLower.includes('identity') || reqLower.includes('status') || reqLower.includes('citizenship') || reqLower.includes('visa')) {
+      return doc.category === 'Identity' || titleLower.includes('firstgen') || titleLower.includes('verification');
+    }
+
+    // Direct title matching fallback
+    return titleLower.includes(reqLower) || reqLower.includes(titleLower);
+  });
+
+  if (!candidate) {
+    return {
+      requiredName: reqName,
+      status: 'Missing',
+      explanation: 'No matching document found in your Document Vault.'
+    };
+  }
+
+  // Check valid status
+  if (candidate.status === 'Verified') {
+    return {
+      requiredName: reqName,
+      status: 'Verified',
+      matchedDoc: candidate,
+      explanation: `Verified document in Vault: "${candidate.title}" (${candidate.fileName})`
+    };
+  }
+
+  if (candidate.status === 'Pending Review') {
+    return {
+      requiredName: reqName,
+      status: 'Pending Review',
+      matchedDoc: candidate,
+      explanation: `Document held in Vault is pending certification: "${candidate.title}". Does not satisfy completed requirement.`
+    };
+  }
+
+  if (candidate.status === 'Draft') {
+    return {
+      requiredName: reqName,
+      status: 'Draft',
+      matchedDoc: candidate,
+      explanation: `Document held in Vault is marked as Draft: "${candidate.title}". Drafts do not satisfy completed requirement.`
+    };
+  }
+
+  return {
+    requiredName: reqName,
+    status: 'Missing',
+    matchedDoc: candidate,
+    explanation: `Document in Vault is expired: "${candidate.title}". Requires updated certificate.`
+  };
+}
 
 export interface CopilotAnalysis {
   scholarship: Scholarship;
   readinessPercentage: number;
   totalRequirementsCount: number;
   completedRequirementsCount: number;
-  missingDocuments: string[];
-  heldDocuments: { requiredName: string; matchedDoc: VaultDocument }[];
+  documentRequirements: DocumentRequirementItem[];
+  verifiedDocuments: DocumentRequirementItem[];
+  pendingDocuments: DocumentRequirementItem[];
+  draftDocuments: DocumentRequirementItem[];
+  missingDocuments: DocumentRequirementItem[];
   recommendedChecklist: ApplicationTask[];
   brainstormPrompts: { angle: string; explanation: string; suggestedHooks: string[] };
   commonMistakes: string[];
@@ -19,52 +117,56 @@ export function generateCopilotAnalysis(
   vaultDocs: VaultDocument[],
   application?: ApplicationRecord
 ): CopilotAnalysis {
-  const missingDocuments: string[] = [];
-  const heldDocuments: { requiredName: string; matchedDoc: VaultDocument }[] = [];
+  // 1. Cross-reference every required document against Vault
+  const documentRequirements: DocumentRequirementItem[] = scholarship.requiredDocuments.map(reqName =>
+    matchDocumentToRequirement(reqName, vaultDocs)
+  );
 
-  // 1. Cross-reference required docs with Vault
-  scholarship.requiredDocuments.forEach(reqName => {
-    const matched = vaultDocs.find(
-      doc =>
-        doc.status === 'Verified' &&
-        (doc.title.toLowerCase().includes(reqName.toLowerCase()) ||
-         reqName.toLowerCase().includes(doc.title.toLowerCase()) ||
-         reqName.toLowerCase().includes(doc.category.toLowerCase()))
-    );
+  const verifiedDocuments = documentRequirements.filter(d => d.status === 'Verified');
+  const pendingDocuments = documentRequirements.filter(d => d.status === 'Pending Review');
+  const draftDocuments = documentRequirements.filter(d => d.status === 'Draft');
+  const missingDocuments = documentRequirements.filter(d => d.status === 'Missing');
 
-    if (matched) {
-      heldDocuments.push({ requiredName: reqName, matchedDoc: matched });
-    } else {
-      missingDocuments.push(reqName);
-    }
-  });
-
-  // 2. Build or read checklist
+  // 2. Synchronize application tasks
   let tasks: ApplicationTask[] = [];
+
   if (application && application.tasks.length > 0) {
-    tasks = application.tasks;
+    // Preserve existing application tasks, but synchronize tasks tied to required documents
+    tasks = application.tasks.map(t => {
+      if (t.requiredDocumentName) {
+        const match = matchDocumentToRequirement(t.requiredDocumentName, vaultDocs);
+        return {
+          ...t,
+          completed: match.status === 'Verified'
+        };
+      }
+      return t;
+    });
   } else {
-    // Generate initial structured checklist
+    // Generate structured checklist from scratch
     tasks = [
-      ...scholarship.requiredDocuments.map((docName, idx) => ({
-        id: `gen-task-doc-${idx}`,
-        title: `Upload & verify: ${docName}`,
-        completed: heldDocuments.some(h => h.requiredName === docName),
-        requiredDocumentName: docName
-      })),
+      ...scholarship.requiredDocuments.map((docName, idx) => {
+        const match = matchDocumentToRequirement(docName, vaultDocs);
+        return {
+          id: `gen-task-doc-${idx}`,
+          title: `Upload & verify: ${docName}`,
+          completed: match.status === 'Verified',
+          requiredDocumentName: docName
+        };
+      }),
       {
         id: `gen-task-statement`,
-        title: `Draft and polish Personal Statement / Essay tailored to ${scholarship.title}`,
+        title: `Draft and polish Personal Statement tailored to ${scholarship.title}`,
         completed: false
       },
       {
         id: `gen-task-criteria`,
-        title: `Verify academic standing & GPA cutoff requirements`,
+        title: `Verify academic standing meets minimum GPA threshold (${scholarship.minGpa?.toFixed(2) || 'N/A'})`,
         completed: (profile.gpa || 0) >= (scholarship.minGpa || 0)
       },
       {
         id: `gen-task-review`,
-        title: `Final proofreading against provider conditions before submission`,
+        title: `Final proofreading against sample conditions before submission`,
         completed: false
       }
     ];
@@ -80,29 +182,29 @@ export function generateCopilotAnalysis(
   const studentMajor = profile.fieldOfStudy || 'your discipline';
   const brainstormPrompts = {
     angle: `Connecting ${studentMajor} with ${scholarship.category} Impact`,
-    explanation: `The reviewers for ${scholarship.provider} prioritize candidates who articulate a clear intersection between academic mastery and practical societal contribution.`,
+    explanation: `Demonstration essay strategy: Highlight the intersection between your academic focus in ${studentMajor} and ${scholarship.provider}'s program goals.`,
     suggestedHooks: [
       `"When I first encountered challenges in ${studentMajor}, I realized that financial barriers should never dictate the boundaries of research innovation..."`,
       `"As a ${profile.firstGenerationStudent ? 'first-generation ' : ''}student at ${profile.institution || 'university'}, my focus in ${profile.intendedSpecialization || studentMajor} is driven by a commitment to solving real community bottlenecks..."`,
-      `"Receiving the ${scholarship.title} will bridge the funding deficit in my education, allowing me to dedicate 20+ hours weekly to impactful research rather than external part-time jobs."`
+      `"Receiving this opportunity will bridge the financial deficit in my education, allowing me to dedicate 20+ hours weekly to impactful research rather than external part-time jobs."`
     ]
   };
 
   // 4. Common pitfalls
   const commonMistakes = [
-    `Submitting generic personal essays that fail to mention ${scholarship.provider}'s specific mission.`,
+    `Submitting generic personal essays that fail to address ${scholarship.provider}'s specific focus area.`,
     'Attaching uncertified or unofficial transcript screenshots rather than stamped registrar PDFs.',
-    'Requesting recommendation letters less than 10 days before the deadline.',
-    'Ignoring the file size and formatting limits specified in the official portal.'
+    'Requesting faculty recommendation letters less than 10 days before the deadline.',
+    'Ignoring the file size and formatting limits specified in provider instructions.'
   ];
 
-  let submissionReadinessStatement = 'Early Preparation: Checklist items still need attention.';
+  let submissionReadinessStatement = 'Early Preparation: Mandatory verified documents or tasks are still pending.';
   if (readinessPercentage === 100) {
-    submissionReadinessStatement = 'Ready to Submit! All items checked and documents confirmed.';
+    submissionReadinessStatement = 'Ready to Submit! All required documents verified in Vault and tasks complete.';
   } else if (readinessPercentage >= 70) {
-    submissionReadinessStatement = 'High Readiness: Only final review or 1-2 items remaining.';
+    submissionReadinessStatement = 'High Readiness: Only final review or remaining document verification needed.';
   } else if (readinessPercentage >= 40) {
-    submissionReadinessStatement = 'In Progress: Documents and tasks underway.';
+    submissionReadinessStatement = 'In Progress: Tasks underway; ensure draft documents are updated to verified status.';
   }
 
   return {
@@ -110,8 +212,11 @@ export function generateCopilotAnalysis(
     readinessPercentage,
     totalRequirementsCount,
     completedRequirementsCount,
+    documentRequirements,
+    verifiedDocuments,
+    pendingDocuments,
+    draftDocuments,
     missingDocuments,
-    heldDocuments,
     recommendedChecklist: tasks,
     brainstormPrompts,
     commonMistakes,

@@ -40,29 +40,29 @@ export const FundingInsightsPage: React.FC = () => {
   // Recharts Data 1: Funding Pipeline Stages
   const pipelineData = [
     {
-      stage: 'Total Need (Expenses)',
+      stage: 'Total Need',
       amount: fundingMetrics.totalEstimatedExpenses,
       fill: '#CE5A5A'
     },
     {
-      stage: 'Potential (Wishlist)',
-      amount: fundingMetrics.potentialFunding,
+      stage: 'Total Tracked',
+      amount: fundingMetrics.totalTrackedValue,
       fill: '#174C3A'
     },
     {
-      stage: 'Applied (Submitted)',
-      amount: fundingMetrics.appliedFunding,
+      stage: 'Potential (Not Awarded)',
+      amount: fundingMetrics.potentialFunding,
       fill: '#39765A'
     },
     {
-      stage: 'Approved (Awarded)',
-      amount: fundingMetrics.approvedFunding,
-      fill: '#25845A'
+      stage: 'Applied (In Review)',
+      amount: fundingMetrics.appliedFunding,
+      fill: '#9C6710'
     },
     {
       stage: 'Received (Disbursed)',
       amount: fundingMetrics.receivedFunding,
-      fill: '#C8ED79'
+      fill: '#25845A'
     }
   ];
 
@@ -132,8 +132,8 @@ export const FundingInsightsPage: React.FC = () => {
         </span>
       </AlertBanner>
 
-      {/* Top 4 Real Financial Metrics */}
-      <div className="grid-4">
+      {/* Top 5 Real Financial Lifecycle Metrics */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
         <div className="card" style={{ padding: '1.25rem' }}>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Need (Annual Expenses)</span>
           <div style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text)', marginTop: '0.35rem' }}>
@@ -143,11 +143,19 @@ export const FundingInsightsPage: React.FC = () => {
         </div>
 
         <div className="card" style={{ padding: '1.25rem' }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Potential Opportunities Sum</span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Tracked Opportunity Value</span>
           <div style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--primary)', marginTop: '0.35rem' }}>
+            ${fundingMetrics.totalTrackedValue.toLocaleString()}
+          </div>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>All 4 opportunities in student pipeline</span>
+        </div>
+
+        <div className="card" style={{ padding: '1.25rem' }}>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Potential (Not Yet Awarded)</span>
+          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text)', marginTop: '0.35rem' }}>
             ${fundingMetrics.potentialFunding.toLocaleString()}
           </div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>Saved & tracked opportunities</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>Saved & in-progress opportunities</span>
         </div>
 
         <div className="card" style={{ padding: '1.25rem' }}>
@@ -156,17 +164,17 @@ export const FundingInsightsPage: React.FC = () => {
             ${fundingMetrics.appliedFunding.toLocaleString()}
           </div>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
-            {state.applications.filter(a => a.status === 'Submitted' || a.status === 'Under Review').length} active submissions
+            {state.applications.filter(a => a.status === 'Submitted' || a.status === 'Under Review').length} active submissions pending
           </span>
         </div>
 
         <div className="card" style={{ padding: '1.25rem' }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Confirmed Received Funding</span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Confirmed Received</span>
           <div style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--success)', marginTop: '0.35rem' }}>
             ${fundingMetrics.receivedFunding.toLocaleString()}
           </div>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
-            {fundingMetrics.receivedCoveragePercentage}% of total annual expense need covered
+            Green Horizons • {fundingMetrics.receivedCoveragePercentage}% of need covered
           </span>
         </div>
       </div>
@@ -366,12 +374,16 @@ export const FundingInsightsPage: React.FC = () => {
 
         {/* 2. Scenario Simulator Selection */}
         <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.85rem' }}>
+          <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.4rem' }}>
             2. Hypothetical Award Scenario Builder (Select Opportunities to Simulate)
           </h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.85rem' }}>
+            Green Horizons ($8,500) is confirmed received. Toggle other pipeline opportunities to see how new awards close your remaining $27,000 deficit.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '0.75rem' }}>
             {scholarships.map(sch => {
               const isChecked = scenarioScholarshipIds.includes(sch.id);
+              const isReceived = state.applications.find(a => a.scholarshipId === sch.id)?.status === 'Approved';
               return (
                 <label
                   key={sch.id}
@@ -393,8 +405,15 @@ export const FundingInsightsPage: React.FC = () => {
                       onChange={() => toggleScenarioScholarship(sch.id)}
                       style={{ accentColor: 'var(--primary)' }}
                     />
-                    <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)' }}>
-                      {sch.title.substring(0, 26)}...
+                    <div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)' }}>
+                        {sch.title.length > 24 ? `${sch.title.substring(0, 24)}...` : sch.title}
+                      </div>
+                      {isReceived && (
+                        <span style={{ fontSize: '0.7rem', color: 'var(--success)', fontWeight: 700 }}>
+                          • Awarded & Received
+                        </span>
+                      )}
                     </div>
                   </div>
                   <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)' }}>

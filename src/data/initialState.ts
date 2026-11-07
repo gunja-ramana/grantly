@@ -22,7 +22,7 @@ export const INITIAL_STUDENT_PROFILE: StudentProfile = {
   intendedSpecialization: 'Artificial Intelligence & Civic Tech',
   targetDestinations: ['United States', 'Canada', 'United Kingdom'],
   bioStatement: 'Junior undergraduate researcher investigating algorithmic fairness and accessible educational technology. Aiming to build open-source tools for underserved secondary school learners.',
-  profileCompletionPercentage: 92
+  profileCompletionPercentage: 100
 };
 
 export const INITIAL_DOCUMENTS: VaultDocument[] = [
@@ -73,7 +73,7 @@ export const INITIAL_DOCUMENTS: VaultDocument[] = [
     fileType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     uploadDate: '2026-11-01',
     status: 'Draft',
-    notes: 'Work-in-progress draft tailored for STEM fellowships, currently 720 words',
+    notes: 'Work-in-progress draft tailored for STEM fellowships, currently 720 words. (Draft: does not satisfy verified document requirement yet)',
     linkedScholarshipIds: ['sch-001', 'sch-003']
   },
   {
@@ -95,17 +95,17 @@ export const INITIAL_APPLICATIONS: ApplicationRecord[] = [
     id: 'app-001',
     scholarshipId: 'sch-001',
     status: 'Preparing',
-    targetSubmissionDate: '2026-11-18',
-    notes: 'AI ethics draft is nearly done; waiting on final proofreading from university writing center.',
+    targetSubmissionDate: '2026-11-20',
+    notes: 'AI ethics statement is in draft in Vault; need to finalize before priority deadline.',
     personalStatementNotes: 'Highlight civic engagement project with the high school robotics club.',
     createdAt: '2026-10-20',
     updatedAt: '2026-11-04',
     tasks: [
-      { id: 't-1', title: 'Verify official transcript is attached', completed: true, requiredDocumentName: 'Official Academic Transcript' },
-      { id: 't-2', title: 'Complete 750-word Statement of Purpose on ethical tech', completed: false, requiredDocumentName: 'Statement of Purpose (AI Ethics & Vision)' },
-      { id: 't-3', title: 'Obtain Prof. Vance Recommendation Letter', completed: true, requiredDocumentName: 'Letter of Recommendation' },
-      { id: 't-4', title: 'Update Resume / CV with latest publications', completed: true, requiredDocumentName: 'Resume / CV' },
-      { id: 't-5', title: 'Review against provider checklist guidelines', completed: false }
+      { id: 't-1', title: 'Upload & verify: Official Academic Transcript', completed: true, requiredDocumentName: 'Official Academic Transcript' },
+      { id: 't-2', title: 'Upload & verify: Statement of Purpose (AI Ethics & Vision)', completed: false, requiredDocumentName: 'Statement of Purpose (AI Ethics & Vision)' },
+      { id: 't-3', title: 'Upload & verify: Letter of Recommendation', completed: true, requiredDocumentName: 'Letter of Recommendation' },
+      { id: 't-4', title: 'Upload & verify: Resume / CV', completed: false, requiredDocumentName: 'Resume / CV' },
+      { id: 't-5', title: 'Review against sample conditions before submission', completed: true }
     ]
   },
   {
@@ -113,15 +113,15 @@ export const INITIAL_APPLICATIONS: ApplicationRecord[] = [
     scholarshipId: 'sch-002',
     status: 'Under Review',
     appliedDate: '2026-10-25',
-    targetSubmissionDate: '2026-10-25',
+    targetSubmissionDate: '2026-12-05',
     notes: 'Submitted full packet. Expected decision notice by first week of December.',
     createdAt: '2026-10-05',
     updatedAt: '2026-10-26',
     tasks: [
-      { id: 't-10', title: 'First-gen verification uploaded', completed: true },
-      { id: 't-11', title: 'Income tax documents attached', completed: true },
-      { id: 't-12', title: 'Personal resilience essay submitted', completed: true },
-      { id: 't-13', title: 'Official college transcript included', completed: true }
+      { id: 't-10', title: 'Upload & verify: FAFSA or Official Household Income Proof', completed: true, requiredDocumentName: 'FAFSA or Official Household Income Proof' },
+      { id: 't-11', title: 'Upload & verify: Official Academic Transcript', completed: true, requiredDocumentName: 'Official Academic Transcript' },
+      { id: 't-12', title: 'Upload & verify: Verification of First-Generation Status', completed: true, requiredDocumentName: 'Verification of First-Generation Status' },
+      { id: 't-13', title: 'Submit 500-word personal resilience essay', completed: true }
     ]
   },
   {
@@ -129,14 +129,14 @@ export const INITIAL_APPLICATIONS: ApplicationRecord[] = [
     scholarshipId: 'sch-003',
     status: 'Submitted',
     appliedDate: '2026-11-02',
-    targetSubmissionDate: '2026-11-03',
+    targetSubmissionDate: '2026-11-15',
     notes: 'Submitted before priority deadline. Portfolio link included in application portal.',
     createdAt: '2026-10-15',
     updatedAt: '2026-11-02',
     tasks: [
-      { id: 't-20', title: 'Attach STEM transcript', completed: true },
-      { id: 't-21', title: 'Two STEM faculty recommendation letters', completed: true },
-      { id: 't-22', title: 'Provide GitHub repository link', completed: true },
+      { id: 't-20', title: 'Upload & verify: Official Academic Transcript', completed: true, requiredDocumentName: 'Official Academic Transcript' },
+      { id: 't-21', title: 'Upload & verify: Letter of Recommendation', completed: true, requiredDocumentName: 'Letter of Recommendation' },
+      { id: 't-22', title: 'Provide GitHub repository / project portfolio link', completed: true },
       { id: 't-23', title: 'Submit personal statement on women in tech', completed: true }
     ]
   },
@@ -145,17 +145,17 @@ export const INITIAL_APPLICATIONS: ApplicationRecord[] = [
     scholarshipId: 'sch-006',
     status: 'Approved',
     appliedDate: '2026-09-10',
-    targetSubmissionDate: '2026-09-12',
+    targetSubmissionDate: '2026-11-28',
     fundingReceivedAmount: 8500,
     disbursementDate: '2026-10-15',
     notes: 'Award granted! Official check disbursed to financial aid bursar office on Oct 15.',
     createdAt: '2026-08-25',
     updatedAt: '2026-10-15',
     tasks: [
-      { id: 't-30', title: 'Initial sustainability project synopsis', completed: true },
-      { id: 't-31', title: 'Academic transcript', completed: true },
-      { id: 't-32', title: 'Sign award acceptance letter', completed: true },
-      { id: 't-33', title: 'Set up direct bursar disbursement', completed: true }
+      { id: 't-30', title: 'Upload & verify: Official Academic Transcript', completed: true, requiredDocumentName: 'Official Academic Transcript' },
+      { id: 't-31', title: 'Upload & verify: Letter of Recommendation', completed: true, requiredDocumentName: 'Letter of Recommendation' },
+      { id: 't-32', title: 'Submit sustainability project synopsis', completed: true },
+      { id: 't-33', title: 'Sign award acceptance letter & direct bursar disbursement', completed: true }
     ]
   }
 ];

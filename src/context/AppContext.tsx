@@ -16,6 +16,7 @@ import { MOCK_SCHOLARSHIPS } from '../data/mockScholarships';
 import { calculateOpportunityRadar } from '../features/opportunity-radar/engine';
 import { calculateOpportunityDNA } from '../features/eligibility/engine';
 import { calculateFundingMetrics, calculateStudentMomentum, FundingMetrics, StudentMomentumStats } from '../features/funding-simulator/engine';
+import { matchDocumentToRequirement } from '../features/copilot/engine';
 
 interface AppContextValue {
   state: AppState;
@@ -119,12 +120,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       const deadline = targetDate || sch?.applicationDeadline || new Date().toISOString().substring(0, 10);
-      const initialTasks: ApplicationTask[] = (sch?.requiredDocuments || []).map((doc, idx) => ({
-        id: `task-init-${idx}`,
-        title: `Prepare & verify: ${doc}`,
-        completed: prev.documents.some(d => d.status === 'Verified' && d.title.toLowerCase().includes(doc.toLowerCase())),
-        requiredDocumentName: doc
-      }));
+      const initialTasks: ApplicationTask[] = (sch?.requiredDocuments || []).map((doc, idx) => {
+        const match = matchDocumentToRequirement(doc, prev.documents);
+        return {
+          id: `task-init-${idx}`,
+          title: `Upload & verify: ${doc}`,
+          completed: match.status === 'Verified',
+          requiredDocumentName: doc
+        };
+      });
 
       // Add general statement and review tasks
       initialTasks.push({
@@ -294,7 +298,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, []);
 
-  // 8. Add Vault Document
+  // 8. Add Vault Document (Synchronizes linked tasks)
   const addVaultDocument = useCallback((doc: Omit<VaultDocument, 'id' | 'uploadDate'>) => {
     const newDoc: VaultDocument = {
       ...doc,
@@ -302,6 +306,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       uploadDate: new Date().toISOString().substring(0, 10)
     };
     setState(prev => {
+      const newDocuments = [newDoc, ...prev.documents];
       const newActivity: ActivityItem = {
         id: `act-${Date.now()}`,
         timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
@@ -309,21 +314,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         description: `Added "${newDoc.title}" (${newDoc.category}).`,
         type: 'document'
       };
+
+      // Cross-module synchronization: re-evaluate document-linked tasks
+      const updatedApplications = prev.applications.map(app => ({
+        ...app,
+        tasks: app.tasks.map(t => {
+          if (t.requiredDocumentName) {
+            const match = matchDocumentToRequirement(t.requiredDocumentName, newDocuments);
+            return { ...t, completed: match.status === 'Verified' };
+          }
+          return t;
+        })
+      }));
+
       return {
         ...prev,
-        documents: [newDoc, ...prev.documents],
+        documents: newDocuments,
+        applications: updatedApplications,
         activities: [newActivity, ...prev.activities.slice(0, 19)]
       };
     });
   }, []);
 
-  // 9. Delete Vault Document
+  // 9. Delete Vault Document (Synchronizes linked tasks)
   const deleteVaultDocument = useCallback((docId: string) => {
     setState(prev => {
       const doc = prev.documents.find(d => d.id === docId);
+      const newDocuments = prev.documents.filter(d => d.id !== docId);
+
+      // Re-evaluate document-linked tasks against remaining documents
+      const updatedApplications = prev.applications.map(app => ({
+        ...app,
+        tasks: app.tasks.map(t => {
+          if (t.requiredDocumentName) {
+            const match = matchDocumentToRequirement(t.requiredDocumentName, newDocuments);
+            return { ...t, completed: match.status === 'Verified' };
+          }
+          return t;
+        })
+      }));
+
       return {
         ...prev,
-        documents: prev.documents.filter(d => d.id !== docId),
+        documents: newDocuments,
+        applications: updatedApplications,
         activities: [
           {
             id: `act-${Date.now()}`,
@@ -338,12 +372,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, []);
 
-  // 10. Update Vault Document Status
+  // 10. Update Vault Document Status (Synchronizes linked tasks)
   const updateVaultDocumentStatus = useCallback((docId: string, status: VaultDocument['status']) => {
-    setState(prev => ({
-      ...prev,
-      documents: prev.documents.map(d => d.id === docId ? { ...d, status } : d)
-    }));
+    setState(prev => {
+      const newDocuments = prev.documents.map(d => d.id === docId ? { ...d, status } : d);
+
+      // Re-evaluate document-linked tasks: Draft/Pending documents MUST NOT satisfy completed requirements!
+      const updatedApplications = prev.applications.map(app => ({
+        ...app,
+        tasks: app.tasks.map(t => {
+          if (t.requiredDocumentName) {
+            const match = matchDocumentToRequirement(t.requiredDocumentName, newDocuments);
+            return { ...t, completed: match.status === 'Verified' };
+          }
+          return t;
+        })
+      }));
+
+      return {
+        ...prev,
+        documents: newDocuments,
+        applications: updatedApplications
+      };
+    });
   }, []);
 
   // 11. Update Expenses

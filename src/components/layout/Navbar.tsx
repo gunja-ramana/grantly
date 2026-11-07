@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, User, DollarSign, Calendar } from 'lucide-react';
+import { Menu, User, DollarSign, Calendar, CheckCircle2 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 
@@ -8,7 +8,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
-  const { state, fundingMetrics, radarItems } = useApp();
+  const { state, fundingMetrics, radarItems, opportunityDNA } = useApp();
   const location = useLocation();
 
   // Find nearest upcoming deadline
@@ -62,13 +62,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
             {getPageTitle()}
           </h2>
           <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            GRANTLY Intelligence v1.0
+            GRANTLY Intelligence v1.0 • Client-Side Persistence
           </span>
         </div>
       </div>
 
       {/* Right Stats & Profile Quick Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
         {/* Next Urgent Deadline Pill */}
         {nextItem && (
           <div
@@ -87,11 +87,33 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
             title={`Next deadline: ${nextItem.scholarship.title} on ${nextItem.scholarship.applicationDeadline}`}
           >
             <Calendar size={14} />
-            <span>Next: {nextItem.daysRemaining}d ({nextItem.scholarship.provider.substring(0, 16)}...)</span>
+            <span>Next: {nextItem.daysRemaining}d ({nextItem.scholarship.provider.replace(/\s*\(Sample\)/, '').substring(0, 14)}...)</span>
           </div>
         )}
 
-        {/* Potential Funding Pill */}
+        {/* Received Funding Confirmed */}
+        {fundingMetrics.receivedFunding > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              padding: '0.4rem 0.75rem',
+              backgroundColor: 'var(--success-soft)',
+              borderRadius: 'var(--radius-full)',
+              fontSize: '0.8rem',
+              color: 'var(--success)',
+              fontWeight: 700,
+              border: '1px solid rgba(37, 132, 90, 0.2)'
+            }}
+            title={`Confirmed received disbursements: $${fundingMetrics.receivedFunding.toLocaleString()}`}
+          >
+            <CheckCircle2 size={14} />
+            <span>${fundingMetrics.receivedFunding.toLocaleString()} Received</span>
+          </div>
+        )}
+
+        {/* Potential Funding Pill (Not Awarded) */}
         <div
           style={{
             display: 'flex',
@@ -104,12 +126,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
             color: 'var(--primary)',
             fontWeight: 700
           }}
+          title={`Potential opportunities tracked (not yet awarded): $${fundingMetrics.potentialFunding.toLocaleString()}`}
         >
           <DollarSign size={14} />
           <span>${fundingMetrics.potentialFunding.toLocaleString()} Potential</span>
         </div>
 
-        {/* Profile Link */}
+        {/* Profile Link with Unified Opportunity DNA Completeness */}
         <Link
           to="/profile"
           style={{
@@ -145,7 +168,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
               {state.profile.fullName || 'Student'}
             </span>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-              {state.profile.profileCompletionPercentage}% Profile
+              {opportunityDNA.profileCompleteness}% Profile
             </span>
           </div>
         </Link>

@@ -79,6 +79,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
             <Badge variant="lavender">{scholarship.category}</Badge>
             {renderEligibilityBadge(eligibility.status)}
             {scholarship.isFeatured && <Badge variant="accent">Featured</Badge>}
+            {scholarship.isSampleData && <Badge variant="neutral">Sample</Badge>}
           </div>
           <h3
             style={{
@@ -168,6 +169,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
             <Badge variant="lavender">{scholarship.category}</Badge>
             {renderEligibilityBadge(eligibility.status)}
+            {scholarship.isSampleData && <Badge variant="neutral">Sample</Badge>}
           </div>
           <button
             onClick={() => toggleBookmark(scholarship.id)}

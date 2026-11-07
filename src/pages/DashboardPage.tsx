@@ -20,7 +20,7 @@ import { ScholarshipDetailModal } from '../components/scholarships/ScholarshipDe
 import { Scholarship } from '../types';
 
 export const DashboardPage: React.FC = () => {
-  const { state, scholarships, radarItems, fundingMetrics, momentumStats } = useApp();
+  const { state, scholarships, radarItems, fundingMetrics, momentumStats, opportunityDNA } = useApp();
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
 
   // Eligible count
@@ -115,66 +115,111 @@ export const DashboardPage: React.FC = () => {
         />
       </div>
 
-      {/* 2. Primary KPI Stats derived 100% from underlying state */}
-      <div className="grid-4">
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Eligible Matches</span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--primary-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
-              <Compass size={18} />
-            </div>
-          </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>
-            {eligibleCount}
-          </div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
-            Out of {scholarships.length} catalog opportunities
+      {/* 2. Primary Financial Lifecycle Classifications */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
+            Financial Lifecycle Intelligence
+          </h2>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            Strictly classified • Received funding is never double-counted as potential
           </span>
         </div>
-
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Saved Opportunities</span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-dark)' }}>
-              <BookmarkCheck size={18} />
+        <div className="grid-4">
+          <div className="card" style={{ padding: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Tracked Value</span>
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--primary-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+                <DollarSign size={18} />
+              </div>
             </div>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>
+              ${fundingMetrics.totalTrackedValue.toLocaleString()}
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
+              Across all 4 tracked opportunities
+            </span>
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)' }}>
-            {state.bookmarkedScholarshipIds.length}
+
+          <div className="card" style={{ padding: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Potential (Not Awarded)</span>
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-dark)' }}>
+                <Compass size={18} />
+              </div>
+            </div>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)' }}>
+              ${fundingMetrics.potentialFunding.toLocaleString()}
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
+              Excludes already received funds
+            </span>
           </div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
-            Tracked in saved wishlist
-          </span>
+
+          <div className="card" style={{ padding: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Applied in Review</span>
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--lavender)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--lavender-text)' }}>
+                <FileCheck2 size={18} />
+              </div>
+            </div>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#9C6710' }}>
+              ${fundingMetrics.appliedFunding.toLocaleString()}
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
+              {state.applications.filter(a => a.status === 'Submitted' || a.status === 'Under Review').length} active submissions pending
+            </span>
+          </div>
+
+          <div className="card" style={{ padding: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Confirmed Received</span>
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--success-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--success)' }}>
+                <CheckCircle2 size={18} />
+              </div>
+            </div>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--success)' }}>
+              ${fundingMetrics.receivedFunding.toLocaleString()}
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
+              Green Horizons • {fundingMetrics.receivedCoveragePercentage}% of need covered
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 2b. Secondary Operational Summary Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '0.75rem' }}>
+        <div style={{ padding: '0.75rem 1rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>Eligible Matches</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>{eligibleCount} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-subtle)' }}>/ {scholarships.length}</span></div>
+          </div>
+          <Compass size={18} color="var(--primary)" />
         </div>
 
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Active Applications</span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--lavender)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--lavender-text)' }}>
-              <FileCheck2 size={18} />
-            </div>
+        <div style={{ padding: '0.75rem 1rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>Saved Wishlist</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text)' }}>{state.bookmarkedScholarshipIds.length}</div>
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)' }}>
-            {activeApplicationsCount}
-          </div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
-            {state.applications.filter(a => a.status === 'Approved').length} approved & awarded
-          </span>
+          <BookmarkCheck size={18} color="var(--accent-dark)" />
         </div>
 
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Potential Funding</span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--success-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--success)' }}>
-              <DollarSign size={18} />
-            </div>
+        <div style={{ padding: '0.75rem 1rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>Active Tracked</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text)' }}>{state.applications.length} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-subtle)' }}>({activeApplicationsCount} in progress)</span></div>
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--success)' }}>
-            ${fundingMetrics.potentialFunding.toLocaleString()}
+          <FileCheck2 size={18} color="var(--lavender-text)" />
+        </div>
+
+        <div style={{ padding: '0.75rem 1rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>Preparation Tasks</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--success)' }}>{momentumStats.tasksCompleted} / {momentumStats.totalTasks} <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-subtle)' }}>({momentumStats.taskCompletionPercentage}%)</span></div>
           </div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
-            ${fundingMetrics.receivedFunding.toLocaleString()} confirmed received
-          </span>
+          <CheckCircle2 size={18} color="var(--success)" />
         </div>
       </div>
 
@@ -284,10 +329,13 @@ export const DashboardPage: React.FC = () => {
               <ProgressBar
                 value={momentumStats.momentumScore}
                 label="Overall Progress Velocity"
-                sublabel={`Level: ${momentumStats.momentumLevel} • ${momentumStats.tasksCompleted}/${momentumStats.totalTasks} Preparation Tasks Done`}
+                sublabel={`Momentum Score: ${momentumStats.momentumScore}/100 (${momentumStats.momentumLevel}) • Preparation Tasks: ${momentumStats.tasksCompleted}/${momentumStats.totalTasks} (${momentumStats.taskCompletionPercentage}%)`}
                 variant="primary"
                 height={10}
               />
+              <div style={{ fontSize: '0.76rem', color: 'var(--text-subtle)', marginTop: '0.45rem', lineHeight: 1.4 }}>
+                Composite index: Combines Profile Completeness ({opportunityDNA.profileCompleteness}%), Vault Document Verification, and Checklist Completion ({momentumStats.tasksCompleted}/{momentumStats.totalTasks} = {momentumStats.taskCompletionPercentage}%).
+              </div>
             </div>
 
             {/* Real Milestones Checklist */}
@@ -335,7 +383,7 @@ export const DashboardPage: React.FC = () => {
           <div style={{ marginTop: '1.25rem', paddingTop: '0.85rem', borderTop: '1px solid var(--border-light)' }}>
             <Link to="/profile">
               <Button variant="secondary" size="sm" style={{ width: '100%' }}>
-                Update Opportunity DNA & Profile ({state.profile.profileCompletionPercentage}% complete)
+                Update Opportunity DNA & Profile ({opportunityDNA.profileCompleteness}% complete)
               </Button>
             </Link>
           </div>

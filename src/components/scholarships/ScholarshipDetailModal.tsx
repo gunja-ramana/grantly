@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import {
   Scholarship,
-  ApplicationStatus
+  ApplicationStatus,
+  DocumentRequirementItem
 } from '../../types';
 import { Modal } from '../common/Modal';
 import { Badge } from '../common/Badge';
@@ -107,6 +108,16 @@ export const ScholarshipDetailModal: React.FC<ScholarshipDetailModalProps> = ({
         </div>
       }
     >
+      {scholarship.isSampleData && (
+        <div style={{ marginBottom: '1rem' }}>
+          <AlertBanner type="info" title="Sample Demonstration Opportunity">
+            <span>
+              This scholarship listing is a synthesized demonstration model compiled for the hackathon evaluation of GRANTLY. Official scholarship criteria, deadlines, and disbursements must be verified through the sponsoring institution.
+            </span>
+          </AlertBanner>
+        </div>
+      )}
+
       {/* Top Banner KPI Cards */}
       <div
         style={{
@@ -472,13 +483,24 @@ export const ScholarshipDetailModal: React.FC<ScholarshipDetailModalProps> = ({
       {/* Tab 4: Required Documents */}
       {activeTab === 'documents' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
-            The following documentation is mandatory for this application. Cross-referenced against your Document Vault:
-          </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0 }}>
+              Mandatory application documents cross-referenced against your Document Vault:
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.75rem' }}>
+              <span style={{ color: 'var(--success)', fontWeight: 700 }}>{copilot.verifiedDocuments.length} Verified</span>
+              {copilot.pendingDocuments.length > 0 && <span style={{ color: '#9C6710', fontWeight: 700 }}>• {copilot.pendingDocuments.length} Pending</span>}
+              {copilot.draftDocuments.length > 0 && <span style={{ color: 'var(--lavender-text)', fontWeight: 700 }}>• {copilot.draftDocuments.length} Draft</span>}
+              {copilot.missingDocuments.length > 0 && <span style={{ color: 'var(--danger)', fontWeight: 700 }}>• {copilot.missingDocuments.length} Missing</span>}
+            </div>
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-            {scholarship.requiredDocuments.map((docName, idx) => {
-              const matched = copilot.heldDocuments.find(h => h.requiredName === docName);
+            {copilot.documentRequirements.map((item: DocumentRequirementItem, idx: number) => {
+              const isVerified = item.status === 'Verified';
+              const isPending = item.status === 'Pending Review';
+              const isDraft = item.status === 'Draft';
+
               return (
                 <div
                   key={idx}
@@ -487,28 +509,65 @@ export const ScholarshipDetailModal: React.FC<ScholarshipDetailModalProps> = ({
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '0.85rem 1rem',
-                    backgroundColor: matched ? 'var(--success-soft)' : 'var(--surface-subtle)',
+                    backgroundColor: isVerified
+                      ? 'var(--success-soft)'
+                      : isPending
+                      ? 'var(--warning-soft)'
+                      : isDraft
+                      ? 'var(--lavender-soft)'
+                      : 'var(--surface-subtle)',
                     border: '1px solid var(--border)',
                     borderRadius: 'var(--radius-md)'
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <FileText size={18} color={matched ? 'var(--success)' : 'var(--text-subtle)'} />
+                    <FileText
+                      size={18}
+                      color={
+                        isVerified
+                          ? 'var(--success)'
+                          : isPending
+                          ? '#9C6710'
+                          : isDraft
+                          ? 'var(--lavender-text)'
+                          : 'var(--text-subtle)'
+                      }
+                    />
                     <div>
                       <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text)' }}>
-                        {docName}
+                        {item.requiredName}
                       </div>
                       <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                        {matched ? `Attached: ${matched.matchedDoc.title} (${matched.matchedDoc.fileName})` : 'Not found in Document Vault'}
+                        {item.explanation}
                       </div>
                     </div>
                   </div>
-                  <Badge variant={matched ? 'emerald' : 'warning'}>
-                    {matched ? 'Verified in Vault' : 'Missing'}
+                  <Badge
+                    variant={
+                      isVerified
+                        ? 'emerald'
+                        : isPending
+                        ? 'warning'
+                        : isDraft
+                        ? 'lavender'
+                        : 'danger'
+                    }
+                  >
+                    {item.status === 'Verified'
+                      ? 'Verified in Vault'
+                      : item.status === 'Pending Review'
+                      ? 'Pending Review (Unsatisfied)'
+                      : item.status === 'Draft'
+                      ? 'Draft Only (Unsatisfied)'
+                      : 'Missing in Vault'}
                   </Badge>
                 </div>
               );
             })}
+          </div>
+
+          <div style={{ fontSize: '0.76rem', color: 'var(--text-subtle)', lineHeight: 1.45, marginTop: '0.5rem' }}>
+            Note: Draft or Pending documents do not satisfy completed submission requirements. Only documents marked <strong>Verified</strong> count toward readiness. All records are stored locally on your device without cloud transmission.
           </div>
         </div>
       )}

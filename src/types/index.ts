@@ -29,6 +29,16 @@ export type DocumentCategory =
 
 export type DocumentStatus = 'Verified' | 'Pending Review' | 'Draft' | 'Expired';
 
+export type DocumentRequirementStatus = 'Verified' | 'Pending Review' | 'Draft' | 'Missing';
+
+export interface DocumentRequirementItem {
+  requiredName: string;
+  categoryHint?: DocumentCategory;
+  status: DocumentRequirementStatus;
+  matchedDoc?: VaultDocument;
+  explanation: string;
+}
+
 export type EligibilityStatus =
   | 'Eligible'
   | 'Potentially Eligible'
@@ -77,6 +87,7 @@ export interface Scholarship {
   importantConditions: string[];
   sourceAttribution: string;
   isFeatured?: boolean;
+  isSampleData?: boolean;
   totalSeats?: number;
 }
 
@@ -150,6 +161,21 @@ export interface EducationExpenses {
   booksAndSupplies: number;
   travelAndTransport: number;
   otherExpenses: number;
+}
+
+export interface FundingMetrics {
+  totalEstimatedExpenses: number;
+  totalTrackedValue: number; // All tracked opportunities ($51,500)
+  potentialFunding: number; // Potential, not yet awarded ($43,000)
+  appliedFunding: number; // In Review or Submitted ($28,000)
+  approvedFunding: number; // Approved ($8,500)
+  receivedFunding: number; // Confirmed received ($8,500)
+  remainingGapAfterReceived: number;
+  remainingGapAfterApproved: number;
+  remainingGapAfterApplied: number;
+  remainingGapAfterPotential: number;
+  receivedCoveragePercentage: number;
+  potentialCoveragePercentage: number;
 }
 
 export interface OpportunityRadarItem {

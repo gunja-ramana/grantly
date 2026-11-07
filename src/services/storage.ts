@@ -1,5 +1,6 @@
-import { AppState } from '../types';
+import { AppState, StudentProfile } from '../types';
 import { INITIAL_STATE } from '../data/initialState';
+import { calculateOpportunityDNA } from '../features/eligibility/engine';
 
 const STORAGE_KEY = 'grantly_app_state_v1';
 const CURRENT_VERSION = 1;
@@ -33,6 +34,11 @@ export class StorageService {
       ) {
         console.warn('Corrupted state structure detected; restoring sensible default.');
         return this.saveState(INITIAL_STATE);
+      }
+
+      // Authoritative healing: enforce dynamic Opportunity DNA completeness
+      if (parsed.profile) {
+        parsed.profile.profileCompletionPercentage = calculateOpportunityDNA(parsed.profile as StudentProfile).profileCompleteness;
       }
 
       return parsed as AppState;

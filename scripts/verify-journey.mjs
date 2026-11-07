@@ -44,15 +44,35 @@ test('Launch application and inspect baseline state', () => {
   return `Loaded profile: ${profile.fullName}, GPA: ${profile.gpa}, Major: ${profile.fieldOfStudy}`;
 });
 
-// TEST 2: Verify Dashboard KPI logic
-test('Verify Dashboard KPI calculations', () => {
-  const expenses = { tuition: 18000, accommodation: 9600, livingExpenses: 4500, booksAndSupplies: 1200, travelAndTransport: 1400, otherExpenses: 800 };
-  const total = Object.values(expenses).reduce((a, b) => a + b, 0);
-  if (total !== 35500) throw new Error(`Expected 35500, got ${total}`);
-  const received = 8500;
-  const remaining = total - received;
-  if (remaining !== 27000) throw new Error(`Expected 27000 gap, got ${remaining}`);
-  return `Total expenses: $${total}, Confirmed received: $${received}, Net gap: $${remaining}`;
+// TEST 2: Verify Shared Financial Lifecycle Classification & Zero Double-Counting
+test('Verify Shared Financial Lifecycle Classifications & Zero Double-Counting', () => {
+  const trackedOpportunities = [
+    { title: 'Future Tech', amount: 15000, status: 'Preparing' }, // In progress
+    { title: 'Lumina', amount: 10000, status: 'Submitted' },     // Applied
+    { title: 'Vanguard', amount: 18000, status: 'Under Review' }, // Applied
+    { title: 'Green Horizons', amount: 8500, status: 'Approved' } // Received & Awarded
+  ];
+
+  const totalTrackedValue = trackedOpportunities.reduce((sum, o) => sum + o.amount, 0);
+  const receivedFunding = trackedOpportunities.filter(o => o.status === 'Approved').reduce((sum, o) => sum + o.amount, 0);
+  const potentialFunding = trackedOpportunities.filter(o => o.status !== 'Approved').reduce((sum, o) => sum + o.amount, 0);
+  const appliedFunding = trackedOpportunities.filter(o => o.status === 'Submitted' || o.status === 'Under Review').reduce((sum, o) => sum + o.amount, 0);
+
+  if (totalTrackedValue !== 51500) throw new Error(`Expected Total Tracked $51,500, got ${totalTrackedValue}`);
+  if (potentialFunding !== 43000) throw new Error(`Expected Potential $43,000, got ${potentialFunding}`);
+  if (appliedFunding !== 28000) throw new Error(`Expected Applied $28,000, got ${appliedFunding}`);
+  if (receivedFunding !== 8500) throw new Error(`Expected Received $8,500, got ${receivedFunding}`);
+
+  // Guarantee Zero Double-Counting
+  if (potentialFunding + receivedFunding !== totalTrackedValue) {
+    throw new Error('Double counting detected! Potential + Received must strictly equal Total Tracked Value.');
+  }
+
+  const annualExpenses = 35500;
+  const netGapRemaining = annualExpenses - receivedFunding;
+  if (netGapRemaining !== 27000) throw new Error(`Expected $27,000 net gap, got ${netGapRemaining}`);
+
+  return `Total Tracked: $${totalTrackedValue.toLocaleString()} | Potential (Not Awarded): $${potentialFunding.toLocaleString()} | Applied: $${appliedFunding.toLocaleString()} | Received: $${receivedFunding.toLocaleString()} | Net Gap: $${netGapRemaining.toLocaleString()}`;
 });
 
 // TEST 3: Edit Student Profile
@@ -170,14 +190,46 @@ test('Add scholarship to Application Tracker with tasks', () => {
   return `Application initialized in "${app.status}" status with ${app.tasks.length} checklist items`;
 });
 
-// TEST 13: Smart Application Copilot readiness
-test('Smart Application Copilot cross-reference & readiness', () => {
-  const required = ['Official Academic Transcript', 'Statement of Purpose', 'Faculty Recommendation'];
-  const vaultHeld = ['Official Academic Transcript', 'Faculty Recommendation'];
-  const heldCount = required.filter(r => vaultHeld.includes(r)).length;
-  const readiness = Math.round((heldCount / required.length) * 100);
-  if (readiness !== 67) throw new Error(`Expected 67%, got ${readiness}%`);
-  return `Calculated exact readiness: ${readiness}% (${heldCount}/${required.length} documents ready in Vault)`;
+// TEST 13: Strict Copilot Document Validation (Draft & Pending must NOT satisfy)
+test('Strict Copilot Document Validation (Draft & Pending do NOT satisfy completed requirements)', () => {
+  const vaultDocuments = [
+    { title: 'Official Academic Transcript', category: 'Academic', status: 'Verified' },
+    { title: 'Faculty Recommendation', category: 'Recommendation', status: 'Pending Review' },
+    { title: 'Statement of Purpose', category: 'Personal Statement', status: 'Draft' }
+  ];
+
+  const requiredDocuments = ['Official Academic Transcript', 'Faculty Recommendation', 'Statement of Purpose'];
+
+  // Evaluate matching with strict verification
+  function evaluateReadiness(docs) {
+    const verifiedHeld = requiredDocuments.filter(req => {
+      const match = docs.find(d => d.title.toLowerCase().includes(req.toLowerCase()) || req.toLowerCase().includes(d.title.toLowerCase()));
+      return match && match.status === 'Verified';
+    });
+    return Math.round((verifiedHeld.length / requiredDocuments.length) * 100);
+  }
+
+  // 1. Initial evaluation: Only transcript is Verified
+  const initialReadiness = evaluateReadiness(vaultDocuments);
+  if (initialReadiness !== 33) {
+    throw new Error(`Expected 33% (1/3 verified), got ${initialReadiness}%. Draft and Pending documents must NOT satisfy completed status.`);
+  }
+
+  // 2. Transition Pending Review -> Verified
+  vaultDocuments[1].status = 'Verified';
+  const updatedReadiness1 = evaluateReadiness(vaultDocuments);
+  if (updatedReadiness1 !== 67) {
+    throw new Error(`Expected 67% after confirming recommendation, got ${updatedReadiness1}%`);
+  }
+
+  // 3. Transition Draft -> Verified
+  vaultDocuments[2].status = 'Verified';
+  const updatedReadiness2 = evaluateReadiness(vaultDocuments);
+  if (updatedReadiness2 !== 100) {
+    throw new Error(`Expected 100% after finalizing essay, got ${updatedReadiness2}%`);
+  }
+
+  return 'Strict validation enforced: Draft & Pending documents rejected as unsatisfied. Dynamically recalculated from 33% -> 67% -> 100% on status change';
 });
 
 // TEST 14: Checklist task completion

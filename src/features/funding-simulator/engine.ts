@@ -1,17 +1,6 @@
-import { EducationExpenses, ApplicationRecord, Scholarship, VaultDocument, StudentProfile } from '../../types';
+import { EducationExpenses, ApplicationRecord, Scholarship, VaultDocument, StudentProfile, FundingMetrics } from '../../types';
 
-export interface FundingMetrics {
-  totalEstimatedExpenses: number;
-  potentialFunding: number;
-  appliedFunding: number;
-  approvedFunding: number;
-  receivedFunding: number;
-  remainingGapAfterReceived: number;
-  remainingGapAfterApproved: number;
-  remainingGapAfterPotential: number;
-  receivedCoveragePercentage: number;
-  potentialCoveragePercentage: number;
-}
+export type { FundingMetrics };
 
 export function calculateFundingMetrics(
   expenses: EducationExpenses,
@@ -27,16 +16,32 @@ export function calculateFundingMetrics(
     (expenses.travelAndTransport || 0) +
     (expenses.otherExpenses || 0);
 
-  // 1. Potential Funding: Total award sum of all bookmarked opportunities or active applications
-  const potentialScholarshipIds = Array.from(
+  // 1. Identify applications that are approved or have confirmed received disbursements
+  const approvedOrReceivedAppIds = new Set(
+    applications
+      .filter(a => a.status === 'Approved' || (a.fundingReceivedAmount !== undefined && a.fundingReceivedAmount > 0))
+      .map(a => a.scholarshipId)
+  );
+
+  // 2. All Tracked Opportunity IDs (Saved wishlist or active application tracker)
+  const allTrackedIds = Array.from(
     new Set([...bookmarkedIds, ...applications.map(a => a.scholarshipId)])
   );
+
+  // Total Tracked Opportunity Value: Aggregate award value of all opportunities under consideration ($51,500)
+  const totalTrackedValue = allTrackedIds.reduce((sum, id) => {
+    const sch = scholarships.find(s => s.id === id);
+    return sum + (sch ? sch.awardAmount : 0);
+  }, 0);
+
+  // 3. Potential Funding (Not Yet Awarded): Tracked opportunities that are NOT already approved/received ($43,000)
+  const potentialScholarshipIds = allTrackedIds.filter(id => !approvedOrReceivedAppIds.has(id));
   const potentialFunding = potentialScholarshipIds.reduce((sum, id) => {
     const sch = scholarships.find(s => s.id === id);
     return sum + (sch ? sch.awardAmount : 0);
   }, 0);
 
-  // 2. Applied Funding: Sum of applications in 'Submitted' or 'Under Review'
+  // 4. Applied Funding: Sum of applications explicitly in 'Submitted' or 'Under Review' status ($28,000)
   const appliedApplications = applications.filter(
     a => a.status === 'Submitted' || a.status === 'Under Review'
   );
@@ -45,38 +50,42 @@ export function calculateFundingMetrics(
     return sum + (sch ? sch.awardAmount : 0);
   }, 0);
 
-  // 3. Approved Funding: Sum of applications in 'Approved' status
+  // 5. Approved Funding: Sum of applications in 'Approved' status ($8,500)
   const approvedApplications = applications.filter(a => a.status === 'Approved');
   const approvedFunding = approvedApplications.reduce((sum, app) => {
     const sch = scholarships.find(s => s.id === app.scholarshipId);
     return sum + (sch ? sch.awardAmount : 0);
   }, 0);
 
-  // 4. Received Funding: Actual disbursed amounts recorded in application records
+  // 6. Received Funding: Actual confirmed bursar disbursements recorded ($8,500)
   const receivedFunding = applications.reduce((sum, app) => {
     return sum + (app.fundingReceivedAmount || 0);
   }, 0);
 
+  // 7. Gaps
   const remainingGapAfterReceived = Math.max(0, totalEstimatedExpenses - receivedFunding);
-  const remainingGapAfterApproved = Math.max(0, totalEstimatedExpenses - approvedFunding);
-  const remainingGapAfterPotential = Math.max(0, totalEstimatedExpenses - potentialFunding);
+  const remainingGapAfterApproved = Math.max(0, totalEstimatedExpenses - Math.max(approvedFunding, receivedFunding));
+  const remainingGapAfterApplied = Math.max(0, totalEstimatedExpenses - (receivedFunding + appliedFunding));
+  const remainingGapAfterPotential = Math.max(0, totalEstimatedExpenses - (receivedFunding + potentialFunding));
 
   const receivedCoveragePercentage = totalEstimatedExpenses > 0
     ? Math.min(100, Math.round((receivedFunding / totalEstimatedExpenses) * 100))
     : 0;
 
   const potentialCoveragePercentage = totalEstimatedExpenses > 0
-    ? Math.min(100, Math.round((potentialFunding / totalEstimatedExpenses) * 100))
+    ? Math.min(100, Math.round(((receivedFunding + potentialFunding) / totalEstimatedExpenses) * 100))
     : 0;
 
   return {
     totalEstimatedExpenses,
+    totalTrackedValue,
     potentialFunding,
     appliedFunding,
     approvedFunding,
     receivedFunding,
     remainingGapAfterReceived,
     remainingGapAfterApproved,
+    remainingGapAfterApplied,
     remainingGapAfterPotential,
     receivedCoveragePercentage,
     potentialCoveragePercentage
@@ -84,7 +93,7 @@ export function calculateFundingMetrics(
 }
 
 export interface StudentMomentumStats {
-  momentumScore: number; // 0 - 100
+  momentumScore: number; // 0 - 100 multi-pillar score
   momentumLevel: 'Starting Out' | 'Building Momentum' | 'Accelerating' | 'Unstoppable';
   profileCompletion: number;
   bookmarkedCount: number;
@@ -94,6 +103,7 @@ export interface StudentMomentumStats {
   documentsVerified: number;
   tasksCompleted: number;
   totalTasks: number;
+  taskCompletionPercentage: number;
   milestones: { title: string; achieved: boolean; description: string }[];
 }
 
@@ -119,20 +129,23 @@ export function calculateStudentMomentum(
     tasksCompleted += a.tasks.filter(t => t.completed).length;
   });
 
+  const taskCompletionPercentage = totalTasks > 0
+    ? Math.round((tasksCompleted / totalTasks) * 100)
+    : 0;
+
   // Calculate weighted momentum score (0-100)
-  let score = 0;
-  // Profile: up to 20 pts
-  score += Math.round((profileCompletion / 100) * 20);
-  // Bookmarks: up to 15 pts (3 bookmarks maxed)
+  // 1. Profile: up to 20 pts
+  let score = Math.round((profileCompletion / 100) * 20);
+  // 2. Bookmarks: up to 15 pts (3 bookmarks maxed)
   score += Math.min(15, bookmarkedCount * 5);
-  // Documents verified: up to 20 pts (4 docs maxed)
+  // 3. Documents verified: up to 20 pts (4 docs maxed)
   score += Math.min(20, documentsVerified * 5);
-  // Task completion: up to 25 pts
+  // 4. Task completion: up to 25 pts
   if (totalTasks > 0) {
     score += Math.round((tasksCompleted / totalTasks) * 25);
   }
-  // Applications submitted/approved: up to 20 pts
-  score += Math.min(20, applicationsSubmitted * 10 + applicationsApproved * 10);
+  // 5. Applications submitted/approved: up to 20 pts
+  score += Math.min(20, applicationsSubmitted * 8 + applicationsApproved * 12);
 
   const momentumScore = Math.min(100, Math.max(5, score));
 
@@ -189,6 +202,7 @@ export function calculateStudentMomentum(
     documentsVerified,
     tasksCompleted,
     totalTasks,
+    taskCompletionPercentage,
     milestones
   };
 }
