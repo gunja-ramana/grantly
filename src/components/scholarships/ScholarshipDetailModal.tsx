@@ -283,8 +283,8 @@ export const ScholarshipDetailModal: React.FC<ScholarshipDetailModalProps> = ({
             </div>
           </div>
 
-          <AlertBanner type="info" title="Official Source Attribution">
-            <span>{scholarship.sourceAttribution}. This listing is verified against catalog standards.</span>
+          <AlertBanner type="info" title="Opportunity Source & Attribution">
+            <span>{scholarship.sourceAttribution}. Synthesized demonstration program model compiled for Opportunity DNA evaluation.</span>
           </AlertBanner>
         </div>
       )}

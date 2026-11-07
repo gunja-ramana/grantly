@@ -4,7 +4,8 @@ import {
   LayoutGrid,
   List,
   X,
-  RotateCcw
+  RotateCcw,
+  Filter
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Scholarship, ScholarshipCategory, EducationLevel } from '../types';
@@ -26,6 +27,7 @@ export const DiscoverPage: React.FC = () => {
   const [bookmarkedOnly, setBookmarkedOnly] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<'relevance' | 'deadline' | 'award' | 'title'>('relevance');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isFilterExpanded, setIsFilterExpanded] = useState<boolean>(false);
 
   // Modal State
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
@@ -142,6 +144,13 @@ export const DiscoverPage: React.FC = () => {
     (deadlineFilter !== 'All' ? 1 : 0) +
     (bookmarkedOnly ? 1 : 0);
 
+  const activeSecondaryFilterCount =
+    (selectedEducationLevel !== 'All' ? 1 : 0) +
+    (selectedEligibility !== 'All' ? 1 : 0) +
+    (minAwardAmount > 0 ? 1 : 0) +
+    (deadlineFilter !== 'All' ? 1 : 0) +
+    (bookmarkedOnly ? 1 : 0);
+
   const clearAllFilters = () => {
     setSearchQuery('');
     setSelectedCategory('All');
@@ -161,7 +170,7 @@ export const DiscoverPage: React.FC = () => {
           Discover Scholarships
         </h1>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-          Search, filter, and compare verified educational funding opportunities matched to your Opportunity DNA.
+          Discover and compare scholarship opportunities matched to your academic profile.
         </p>
       </div>
 
@@ -175,7 +184,7 @@ export const DiscoverPage: React.FC = () => {
           padding: '1.25rem'
         }}
       >
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
           {/* Search Box */}
           <div style={{ flex: '1 1 320px', position: 'relative' }}>
             <Search
@@ -186,7 +195,7 @@ export const DiscoverPage: React.FC = () => {
             <input
               type="text"
               className="input-control"
-              style={{ paddingLeft: '2.5rem' }}
+              style={{ paddingLeft: '2.5rem', minHeight: '44px' }}
               placeholder="Search by scholarship title, provider, field of study (e.g., STEM, AI, biology)..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
@@ -196,7 +205,7 @@ export const DiscoverPage: React.FC = () => {
               <button
                 onClick={() => setSearchQuery('')}
                 className="btn-icon"
-                style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', padding: '0.25rem' }}
+                style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', padding: '0.25rem', minHeight: '36px', minWidth: '36px' }}
                 aria-label="Clear search"
               >
                 <X size={16} />
@@ -210,6 +219,7 @@ export const DiscoverPage: React.FC = () => {
               value={selectedCategory}
               onChange={e => setSelectedCategory(e.target.value)}
               className="input-control"
+              style={{ minHeight: '44px' }}
               aria-label="Filter by category"
             >
               {categories.map(c => (
@@ -226,6 +236,7 @@ export const DiscoverPage: React.FC = () => {
               value={sortBy}
               onChange={e => setSortBy(e.target.value as any)}
               className="input-control"
+              style={{ minHeight: '44px' }}
               aria-label="Sort scholarships by"
             >
               <option value="relevance">Sort: Highest Match Score</option>
@@ -235,15 +246,35 @@ export const DiscoverPage: React.FC = () => {
             </select>
           </div>
 
+          {/* Filter Toggle on Narrow Screens */}
+          <button
+            onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+            className={`btn ${isFilterExpanded || activeSecondaryFilterCount > 0 ? 'btn-soft' : 'btn-secondary'} discover-filter-toggle`}
+            style={{
+              minHeight: '44px',
+              padding: '0.6rem 0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.45rem'
+            }}
+            aria-expanded={isFilterExpanded}
+            aria-controls="discover-advanced-filters"
+          >
+            <Filter size={16} />
+            <span>Filters {activeSecondaryFilterCount > 0 ? `(${activeSecondaryFilterCount})` : ''}</span>
+          </button>
+
           {/* View Toggle */}
-          <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden', minHeight: '44px' }}>
             <button
               onClick={() => setViewMode('grid')}
               className="btn-icon"
               style={{
                 backgroundColor: viewMode === 'grid' ? 'var(--primary-soft)' : '#fff',
                 color: viewMode === 'grid' ? 'var(--primary)' : 'var(--text-muted)',
-                borderRadius: 0
+                borderRadius: 0,
+                minHeight: '44px',
+                minWidth: '44px'
               }}
               title="Grid View"
               aria-label="Grid View"
@@ -256,7 +287,9 @@ export const DiscoverPage: React.FC = () => {
               style={{
                 backgroundColor: viewMode === 'list' ? 'var(--primary-soft)' : '#fff',
                 color: viewMode === 'list' ? 'var(--primary)' : 'var(--text-muted)',
-                borderRadius: 0
+                borderRadius: 0,
+                minHeight: '44px',
+                minWidth: '44px'
               }}
               title="List View"
               aria-label="List View"
@@ -268,21 +301,15 @@ export const DiscoverPage: React.FC = () => {
 
         {/* Extended Secondary Filters Row */}
         <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            flexWrap: 'wrap',
-            paddingTop: '0.75rem',
-            borderTop: '1px solid var(--border-light)'
-          }}
+          id="discover-advanced-filters"
+          className={`discover-advanced-filters ${isFilterExpanded ? 'is-expanded' : ''}`}
         >
           {/* Education Level */}
           <select
             value={selectedEducationLevel}
             onChange={e => setSelectedEducationLevel(e.target.value)}
             className="input-control"
-            style={{ width: 'auto', fontSize: '0.82rem', padding: '0.45rem 1.8rem 0.45rem 0.65rem' }}
+            style={{ width: 'auto', fontSize: '0.85rem', minHeight: '42px', padding: '0.5rem 1.8rem 0.5rem 0.75rem' }}
             aria-label="Filter by education level"
           >
             <option value="All">Level: All</option>
@@ -297,7 +324,7 @@ export const DiscoverPage: React.FC = () => {
             value={selectedEligibility}
             onChange={e => setSelectedEligibility(e.target.value)}
             className="input-control"
-            style={{ width: 'auto', fontSize: '0.82rem', padding: '0.45rem 1.8rem 0.45rem 0.65rem' }}
+            style={{ width: 'auto', fontSize: '0.85rem', minHeight: '42px', padding: '0.5rem 1.8rem 0.5rem 0.75rem' }}
             aria-label="Filter by eligibility"
           >
             <option value="All">Eligibility: All</option>
@@ -310,7 +337,7 @@ export const DiscoverPage: React.FC = () => {
             value={deadlineFilter}
             onChange={e => setDeadlineFilter(e.target.value)}
             className="input-control"
-            style={{ width: 'auto', fontSize: '0.82rem', padding: '0.45rem 1.8rem 0.45rem 0.65rem' }}
+            style={{ width: 'auto', fontSize: '0.85rem', minHeight: '42px', padding: '0.5rem 1.8rem 0.5rem 0.75rem' }}
             aria-label="Filter by deadline"
           >
             <option value="All">Deadlines: All</option>
@@ -324,7 +351,7 @@ export const DiscoverPage: React.FC = () => {
             value={minAwardAmount}
             onChange={e => setMinAwardAmount(Number(e.target.value))}
             className="input-control"
-            style={{ width: 'auto', fontSize: '0.82rem', padding: '0.45rem 1.8rem 0.45rem 0.65rem' }}
+            style={{ width: 'auto', fontSize: '0.85rem', minHeight: '42px', padding: '0.5rem 1.8rem 0.5rem 0.75rem' }}
             aria-label="Filter by minimum award amount"
           >
             <option value="0">Award: Any Amount</option>
@@ -340,11 +367,12 @@ export const DiscoverPage: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              fontSize: '0.82rem',
+              fontSize: '0.85rem',
+              minHeight: '42px',
               fontWeight: 600,
               cursor: 'pointer',
               color: 'var(--text)',
-              padding: '0.4rem 0.65rem',
+              padding: '0.5rem 0.75rem',
               backgroundColor: bookmarkedOnly ? 'var(--accent-soft)' : 'transparent',
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--border)'

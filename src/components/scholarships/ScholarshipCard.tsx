@@ -192,14 +192,17 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
             fontWeight: 700,
             lineHeight: 1.35,
             color: 'var(--text)',
-            marginBottom: '0.3rem',
-            cursor: 'pointer'
+            marginBottom: '0.35rem',
+            cursor: 'pointer',
+            minHeight: '2.8rem',
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word'
           }}
           onClick={() => onOpenDetails(scholarship)}
         >
           {scholarship.title}
         </h3>
-        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.85rem' }}>
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
           {scholarship.provider} • <span style={{ fontWeight: 600 }}>{scholarship.providerType}</span>
         </p>
 
@@ -208,12 +211,13 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
           style={{
             fontSize: '0.85rem',
             color: 'var(--text-muted)',
-            lineHeight: 1.45,
+            lineHeight: 1.5,
             marginBottom: '1rem',
             display: '-webkit-box',
-            WebkitLineClamp: 2,
+            WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            minHeight: '3.8rem'
           }}
         >
           {scholarship.summary}

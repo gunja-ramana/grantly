@@ -466,6 +466,92 @@ select.input-control {
   }
 }
 
+/* Financial Lifecycle KPI Summary Grid */
+.financial-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .financial-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .financial-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .financial-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+/* Navbar Deadline Text & Responsive Header Controls */
+.navbar-deadline-text {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@media (max-width: 900px) {
+  .navbar-deadline-text {
+    max-width: 180px;
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar-deadline-text {
+    max-width: 140px;
+  }
+  .hide-mobile-compact {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-deadline-text {
+    max-width: 110px;
+  }
+}
+
+/* Discover Page Collapsible Filter Controls */
+.discover-filter-toggle {
+  display: none !important;
+}
+
+.discover-advanced-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-light);
+}
+
+@media (max-width: 900px) {
+  .discover-filter-toggle {
+    display: inline-flex !important;
+  }
+  .discover-advanced-filters {
+    display: none;
+  }
+  .discover-advanced-filters.is-expanded {
+    display: flex;
+  }
+}
+
 /* Recharts Responsive Container Guardrails */
 .chart-container-wrapper {
   position: relative;

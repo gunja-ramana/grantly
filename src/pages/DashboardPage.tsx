@@ -149,72 +149,74 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* 2. Primary Financial Lifecycle Classifications */}
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
-            Financial Lifecycle Intelligence
-          </h2>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Strictly classified • Received funding is never double-counted as potential
-          </span>
+      <div style={{ marginBottom: '0.25rem' }}>
+        <div style={{ marginBottom: '0.85rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '0.4rem 1rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text)' }}>
+              Financial Lifecycle Intelligence
+            </h2>
+            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+              Strictly classified • Received funding is never double-counted as potential
+            </span>
+          </div>
         </div>
-        <div className="grid-4">
-          <div className="card" style={{ padding: '1.25rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+        <div className="financial-kpi-grid">
+          <div className="card" style={{ padding: '1.15rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
               <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Tracked Value</span>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--primary-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
                 <DollarSign size={18} />
               </div>
             </div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>
+            <div style={{ fontSize: 'clamp(1.35rem, 3.5vw, 1.75rem)', fontWeight: 800, color: 'var(--primary)', lineHeight: 1.2 }}>
               ${fundingMetrics.totalTrackedValue.toLocaleString()}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', marginTop: '0.2rem', display: 'block' }}>
               Across all 4 tracked opportunities
             </span>
           </div>
 
-          <div className="card" style={{ padding: '1.25rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <div className="card" style={{ padding: '1.15rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
               <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Potential (Not Awarded)</span>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-dark)' }}>
                 <Compass size={18} />
               </div>
             </div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)' }}>
+            <div style={{ fontSize: 'clamp(1.35rem, 3.5vw, 1.75rem)', fontWeight: 800, color: 'var(--text)', lineHeight: 1.2 }}>
               ${fundingMetrics.potentialFunding.toLocaleString()}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', marginTop: '0.2rem', display: 'block' }}>
               Excludes already received funds
             </span>
           </div>
 
-          <div className="card" style={{ padding: '1.25rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <div className="card" style={{ padding: '1.15rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
               <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Applied in Review</span>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--lavender)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--lavender-text)' }}>
                 <FileCheck2 size={18} />
               </div>
             </div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#9C6710' }}>
+            <div style={{ fontSize: 'clamp(1.35rem, 3.5vw, 1.75rem)', fontWeight: 800, color: '#9C6710', lineHeight: 1.2 }}>
               ${fundingMetrics.appliedFunding.toLocaleString()}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', marginTop: '0.2rem', display: 'block' }}>
               {state.applications.filter(a => a.status === 'Submitted' || a.status === 'Under Review').length} active submissions pending
             </span>
           </div>
 
-          <div className="card" style={{ padding: '1.25rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <div className="card" style={{ padding: '1.15rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
               <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Confirmed Received</span>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--success-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--success)' }}>
                 <CheckCircle2 size={18} />
               </div>
             </div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--success)' }}>
+            <div style={{ fontSize: 'clamp(1.35rem, 3.5vw, 1.75rem)', fontWeight: 800, color: 'var(--success)', lineHeight: 1.2 }}>
               ${fundingMetrics.receivedFunding.toLocaleString()}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', marginTop: '0.2rem', display: 'block' }}>
               Green Horizons • {fundingMetrics.receivedCoveragePercentage}% of need covered
             </span>
           </div>
@@ -269,7 +271,7 @@ export const DashboardPage: React.FC = () => {
               <Badge variant="accent">Top Priorities</Badge>
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
-              Intelligent multi-factor ranking based on verified eligibility, approaching deadlines, and document preparedness.
+              Intelligent multi-factor ranking based on profile eligibility, approaching deadlines, and document preparedness.
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>

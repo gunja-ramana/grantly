@@ -57,17 +57,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
           <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
             {getPageTitle()}
           </h2>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+          <span className="hide-mobile-compact" style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
             GRANTLY Intelligence v1.0 • Client-Side Persistence
           </span>
         </div>
       </div>
 
       {/* Right Stats & Profile Quick Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'nowrap' }}>
         {/* Next Urgent Deadline Pill - Shared Single Source of Truth */}
         {nearestUpcomingDeadline && (
           <div
+            className="navbar-deadline-pill"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -78,12 +79,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
               borderRadius: 'var(--radius-full)',
               fontSize: '0.78rem',
               color: 'var(--warning-text)',
-              fontWeight: 700
+              fontWeight: 700,
+              flexShrink: 1
             }}
             title={`Next deadline: ${nearestUpcomingDeadline.scholarshipTitle} on ${nearestUpcomingDeadline.deadlineDate}`}
           >
-            <Calendar size={14} />
-            <span>Next: {nearestUpcomingDeadline.daysRemaining}d ({nearestUpcomingDeadline.provider.replace(/\s*\(Sample\)/, '').substring(0, 14)}...)</span>
+            <Calendar size={14} style={{ flexShrink: 0 }} />
+            <span className="navbar-deadline-text">
+              Next: <strong>{nearestUpcomingDeadline.daysRemaining}d</strong> ({nearestUpcomingDeadline.provider.replace(/\s*\(Sample\)/, '').trim()})
+            </span>
           </div>
         )}
 
@@ -100,17 +104,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
               fontSize: '0.8rem',
               color: 'var(--success)',
               fontWeight: 700,
-              border: '1px solid rgba(22, 101, 52, 0.25)'
+              border: '1px solid rgba(22, 101, 52, 0.25)',
+              flexShrink: 0
             }}
             title={`Confirmed received disbursements: $${fundingMetrics.receivedFunding.toLocaleString()}`}
           >
-            <CheckCircle2 size={14} />
+            <CheckCircle2 size={14} style={{ flexShrink: 0 }} />
             <span>${fundingMetrics.receivedFunding.toLocaleString()} Received</span>
           </div>
         )}
 
         {/* Potential Funding Pill (Not Awarded) */}
         <div
+          className="hide-mobile-compact"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -120,11 +126,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
             borderRadius: 'var(--radius-full)',
             fontSize: '0.8rem',
             color: 'var(--primary)',
-            fontWeight: 700
+            fontWeight: 700,
+            flexShrink: 0
           }}
           title={`Potential opportunities tracked (not yet awarded): $${fundingMetrics.potentialFunding.toLocaleString()}`}
         >
-          <DollarSign size={14} />
+          <DollarSign size={14} style={{ flexShrink: 0 }} />
           <span>${fundingMetrics.potentialFunding.toLocaleString()} Potential</span>
         </div>
 
